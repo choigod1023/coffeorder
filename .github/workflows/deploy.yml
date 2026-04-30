@@ -1,0 +1,64 @@
+name: Deploy to Vercel
+
+# Triggers only on pushes to main (not on PRs)
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+
+# ---------------------------------------------------------------------------
+# How to obtain the required GitHub secrets:
+#
+# VERCEL_TOKEN
+#   1. Go to https://vercel.com/account/tokens
+#   2. Click "Create Token", give it a name, and copy the token value.
+#   3. Add it as a GitHub secret: repo Settings > Secrets and variables >
+#      Actions > New repository secret  (name: VERCEL_TOKEN)
+#
+# VERCEL_ORG_ID
+#   1. Install Vercel CLI locally: npm i -g vercel
+#   2. Run: vercel login  (authenticate with your account)
+#   3. Inside this project directory run: vercel link
+#      (link to the choigod1023/coffeorder project on Vercel)
+#   4. Open the generated .vercel/project.json — copy "orgId".
+#   5. Add it as a GitHub secret named VERCEL_ORG_ID.
+#
+# VERCEL_PROJECT_ID
+#   Same file (.vercel/project.json after `vercel link`) — copy "projectId".
+#   Add it as a GitHub secret named VERCEL_PROJECT_ID.
+#
+# Alternatively, both IDs are visible in the Vercel dashboard:
+#   Project > Settings > General  (scroll to "Project ID" and "Team ID").
+# ---------------------------------------------------------------------------
