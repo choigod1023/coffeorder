@@ -165,19 +165,19 @@ export default function HomePage() {
 
       {/* Sticky cart bar */}
       {totalItems > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-amber-100 shadow-lg">
-          <div className="max-w-2xl mx-auto px-4 py-3">
+        <div className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-amber-100 shadow-lg safe-area-pb">
+          <div className="max-w-2xl mx-auto px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
             <button
               onClick={() => setIsCartOpen(true)}
-              className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-xl py-3.5 px-4 flex items-center justify-between transition-colors font-medium"
+              className="w-full bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white rounded-2xl py-4 px-5 flex items-center justify-between transition-colors"
             >
-              <span className="flex items-center gap-2">
-                <span className="bg-amber-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+              <span className="flex items-center gap-3">
+                <span className="bg-amber-500 text-white rounded-full w-7 h-7 flex items-center justify-center text-sm font-bold">
                   {totalItems}
                 </span>
-                장바구니 보기
+                <span className="font-bold text-base">장바구니 보기</span>
               </span>
-              <span className="font-bold">{totalPrice.toLocaleString('ko-KR')}원</span>
+              <span className="font-bold text-base">{totalPrice.toLocaleString('ko-KR')}원</span>
             </button>
           </div>
         </div>
@@ -244,7 +244,7 @@ export default function HomePage() {
                 <button
                   onClick={handleOrder}
                   disabled={isOrdering}
-                  className="w-full bg-amber-600 hover:bg-amber-700 disabled:bg-amber-300 text-white rounded-xl py-4 font-bold text-base transition-colors flex items-center justify-center gap-2"
+                  className="w-full bg-amber-600 hover:bg-amber-700 active:bg-amber-800 disabled:bg-amber-300 text-white rounded-2xl py-4 font-bold text-base transition-colors flex items-center justify-center gap-2"
                 >
                   {isOrdering ? (
                     <>
