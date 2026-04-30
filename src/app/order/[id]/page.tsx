@@ -11,21 +11,23 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
+const BANK_NAMES: Record<string, string> = {
+  '002': '산업은행', '003': '기업은행', '004': '국민은행', '007': '수협은행',
+  '011': '농협은행', '020': '우리은행', '023': 'SC제일은행', '027': '씨티은행',
+  '031': '대구은행', '032': '부산은행', '034': '광주은행', '035': '제주은행',
+  '037': '전북은행', '039': '경남은행', '045': '새마을금고', '048': '신협',
+  '071': '우체국', '081': '하나은행', '088': '신한은행', '089': '케이뱅크',
+  '090': '카카오뱅크', '092': '토스뱅크',
+};
+
 function buildTossUrl(amount: number): string {
-  const bank = process.env.NEXT_PUBLIC_TOSS_BANK_CODE ?? '';
+  const bankCode = process.env.NEXT_PUBLIC_TOSS_BANK_CODE ?? '';
   const account = process.env.NEXT_PUBLIC_TOSS_ACCOUNT_NO ?? '';
-  const holder = process.env.NEXT_PUBLIC_TOSS_HOLDER ?? '';
 
-  if (!bank || !account) return 'supertoss://';
+  if (!bankCode || !account) return 'supertoss://';
 
-  const params = new URLSearchParams({
-    bank,
-    accountNo: account,
-    amount: String(amount),
-    ...(holder && { recipient: holder }),
-    origin: 'qr',
-  });
-  return `supertoss://send?${params.toString()}`;
+  const bankName = BANK_NAMES[bankCode] ?? bankCode;
+  return `supertoss://send?bank=${encodeURIComponent(bankName)}&accountNo=${account}&amount=${amount}`;
 }
 
 function isMobileDevice() {
@@ -130,15 +132,9 @@ export default function OrderPage({ params }: Props) {
                 <QRCodeSVG
                   value={tossUrl}
                   size={220}
-                  fgColor="#92400e"
+                  fgColor="#3182F6"
                   bgColor="#ffffff"
                   level="M"
-                  imageSettings={{
-                    src: '/toss-logo.png',
-                    width: 40,
-                    height: 40,
-                    excavate: true,
-                  }}
                 />
               </div>
 
