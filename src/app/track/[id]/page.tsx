@@ -1,10 +1,11 @@
 'use client';
 
-import { use, useEffect, useState, useRef } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Coffee, Bell } from 'lucide-react';
 import { OrderStatus } from '@/types';
 import OrderStatusTracker from '@/components/OrderStatus';
+import { subscribeToOrder } from '@/lib/orders';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -31,69 +32,19 @@ export default function TrackPage({ params }: Props) {
   const { id } = use(params);
   const router = useRouter();
   const [status, setStatus] = useState<OrderStatus>('paid');
-  const [prevStatus, setPrevStatus] = useState<OrderStatus>('paid');
   const [showReadyBanner, setShowReadyBanner] = useState(false);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  // Demo progression for mock orders
-  const demoIndexRef = useRef(0);
-  const demoStatuses: OrderStatus[] = ['paid', 'preparing', 'ready', 'picked_up'];
 
   useEffect(() => {
-    const pollStatus = async () => {
-      try {
-        const res = await fetch(`/api/orders/${id}/status`);
-        if (res.ok) {
-          const data = await res.json();
-          const newStatus: OrderStatus = data.status;
-          setPrevStatus(s => s);
-          setStatus(prev => {
-            if (prev !== newStatus) setPrevStatus(prev);
-            return newStatus;
-          });
-
-          if (newStatus === 'ready') {
-            setShowReadyBanner(true);
-          }
-
-          if (newStatus === 'picked_up') {
-            if (intervalRef.current) clearInterval(intervalRef.current);
-            setTimeout(() => router.push(`/complete/${id}`), 1500);
-          }
-        } else {
-          // Mock progression for demo
-          demoIndexRef.current = Math.min(demoIndexRef.current + 1, demoStatuses.length - 1);
-          const next = demoStatuses[demoIndexRef.current];
-          setStatus(prev => {
-            setPrevStatus(prev);
-            return next;
-          });
-          if (next === 'ready') setShowReadyBanner(true);
-          if (next === 'picked_up') {
-            if (intervalRef.current) clearInterval(intervalRef.current);
-            setTimeout(() => router.push(`/complete/${id}`), 1500);
-          }
-        }
-      } catch {
-        // Mock progression fallback
-        demoIndexRef.current = Math.min(demoIndexRef.current + 1, demoStatuses.length - 1);
-        const next = demoStatuses[demoIndexRef.current];
-        setStatus(prev => {
-          setPrevStatus(prev);
-          return next;
-        });
-        if (next === 'ready') setShowReadyBanner(true);
-        if (next === 'picked_up') {
-          if (intervalRef.current) clearInterval(intervalRef.current);
-          setTimeout(() => router.push(`/complete/${id}`), 1500);
-        }
+    const unsubscribe = subscribeToOrder(id, (order) => {
+      setStatus(order.status);
+      if (order.status === 'ready') {
+        setShowReadyBanner(true);
       }
-    };
-
-    intervalRef.current = setInterval(pollStatus, 3000);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
+      if (order.status === 'picked_up') {
+        setTimeout(() => router.push(`/complete/${id}`), 1500);
+      }
+    });
+    return unsubscribe;
   }, [id, router]);
 
   const statusBgColors: Record<OrderStatus, string> = {
@@ -114,7 +65,6 @@ export default function TrackPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-amber-50 flex flex-col">
-      {/* Header */}
       <header className="bg-white border-b border-amber-100 shadow-sm">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-2">
           <Coffee className="w-5 h-5 text-amber-700" />
@@ -123,7 +73,6 @@ export default function TrackPage({ params }: Props) {
       </header>
 
       <main className="flex-1 max-w-md mx-auto w-full px-4 py-6 flex flex-col gap-4">
-        {/* Ready banner */}
         {showReadyBanner && (
           <div className="bg-green-500 text-white rounded-2xl p-4 flex items-center gap-3 shadow-lg animate-in slide-in-from-top-4 duration-500">
             <Bell className="w-6 h-6 flex-shrink-0 animate-bounce" />
@@ -134,13 +83,11 @@ export default function TrackPage({ params }: Props) {
           </div>
         )}
 
-        {/* Order number */}
         <div className="bg-white rounded-2xl border border-amber-100 shadow-sm px-5 py-4">
           <p className="text-xs text-gray-500 mb-1">주문번호</p>
           <p className="font-mono text-sm font-semibold text-gray-800">{id}</p>
         </div>
 
-        {/* Status card */}
         <div className={cn('rounded-2xl border border-transparent shadow-sm p-5 transition-colors duration-500', statusBgColors[status])}>
           <div className="flex items-start gap-4 mb-5">
             <div className={cn('w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center flex-shrink-0', statusIconColors[status])}>
@@ -160,11 +107,9 @@ export default function TrackPage({ params }: Props) {
             </div>
           </div>
 
-          {/* Progress tracker */}
           <OrderStatusTracker status={status} />
         </div>
 
-        {/* Polling indicator */}
         {status !== 'picked_up' && (
           <div className="flex items-center justify-center gap-2 text-gray-400 text-xs">
             <div className="w-3 h-3 border border-gray-300 border-t-transparent rounded-full animate-spin" />
@@ -172,7 +117,6 @@ export default function TrackPage({ params }: Props) {
           </div>
         )}
 
-        {/* Info card */}
         <div className="bg-amber-100/50 rounded-xl p-4">
           <p className="text-xs text-amber-800 font-medium mb-1">안내</p>
           <ul className="text-xs text-amber-700 space-y-1">

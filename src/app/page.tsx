@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { MenuItem as MenuItemType, CartItem, CreateOrderResponse } from '@/types';
+import { MenuItem as MenuItemType, CartItem } from '@/types';
 import MenuItemCard from '@/components/MenuItem';
 import CartItemCard from '@/components/CartItem';
 import { ShoppingCart, Coffee, X } from 'lucide-react';
+import { createOrder } from '@/lib/orders';
 
 const SAMPLE_MENU: MenuItemType[] = [
   { id: '1', name: '아메리카노', price: 3000, description: '깔끔하고 진한 에스프레소와 물의 조화', category: '커피' },
@@ -80,30 +81,18 @@ export default function HomePage() {
     if (cart.length === 0) return;
     setIsOrdering(true);
     try {
-      const res = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: cart.map(item => ({
-            menuItemId: item.id,
-            name: item.name,
-            price: item.price,
-            quantity: item.quantity,
-          })),
-          totalPrice,
-        }),
-      });
-
-      if (res.ok) {
-        const data: CreateOrderResponse = await res.json();
-        router.push(`/order/${data.id}`);
-      } else {
-        const mockId = `order-${Date.now()}`;
-        router.push(`/order/${mockId}?mock=true&total=${totalPrice}`);
-      }
-    } catch {
-      const mockId = `order-${Date.now()}`;
-      router.push(`/order/${mockId}?mock=true&total=${totalPrice}`);
+      const orderId = `order-${Date.now()}`;
+      const items = cart.map(item => ({
+        menuItemId: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+      }));
+      await createOrder(orderId, items, totalPrice);
+      router.push(`/order/${orderId}?total=${totalPrice}`);
+    } catch (e) {
+      console.error(e);
+      alert('주문 생성에 실패했습니다. Firebase 설정을 확인해 주세요.');
     } finally {
       setIsOrdering(false);
     }
