@@ -64,10 +64,6 @@ export default function OrderPage({ params }: Props) {
   const handleOpenToss = useCallback(() => {
     const tossUrl = buildTossUrl(total);
     window.location.href = tossUrl;
-    // 앱이 없을 경우 다운로드 페이지로 이동
-    setTimeout(() => {
-      window.location.href = 'https://toss.im/download';
-    }, 2500);
   }, [total]);
 
   const tossUrl = buildTossUrl(total);
