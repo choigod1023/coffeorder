@@ -2,7 +2,7 @@
 
 import { OrderStatus } from '@/types';
 import { cn } from '@/lib/utils';
-import { Check } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 
 const STEPS: { status: OrderStatus; label: string }[] = [
   { status: 'pending', label: '주문접수' },
@@ -18,6 +18,7 @@ const STATUS_INDEX: Record<OrderStatus, number> = {
   preparing: 2,
   ready: 3,
   picked_up: 4,
+  cancelled: -1,
 };
 
 interface OrderStatusProps {
@@ -25,12 +26,20 @@ interface OrderStatusProps {
 }
 
 export default function OrderStatusTracker({ status }: OrderStatusProps) {
+  if (status === 'cancelled') {
+    return (
+      <div className="w-full flex items-center justify-center gap-2 py-3 text-red-500">
+        <X className="w-5 h-5" />
+        <span className="font-bold text-sm">주문이 취소되었습니다</span>
+      </div>
+    );
+  }
+
   const currentIndex = STATUS_INDEX[status];
   const progressPercent = (currentIndex / (STEPS.length - 1)) * 100;
 
   return (
     <div className="w-full">
-      {/* Progress bar */}
       <div className="relative mb-6">
         <div className="absolute top-4 left-0 right-0 h-1 bg-amber-100 rounded-full mx-8">
           <div
@@ -52,7 +61,7 @@ export default function OrderStatusTracker({ status }: OrderStatusProps) {
                     'w-8 h-8 rounded-full flex items-center justify-center transition-all duration-500 z-10',
                     isCompleted && 'bg-amber-500 text-white shadow-md',
                     isCurrent && 'bg-amber-600 text-white shadow-lg ring-2 ring-amber-300 scale-110',
-                    isPending && 'bg-gray-100 text-gray-400 border border-gray-200'
+                    isPending && 'bg-gray-100 text-gray-400 border border-gray-200',
                   )}
                 >
                   {isCompleted ? (
@@ -66,7 +75,7 @@ export default function OrderStatusTracker({ status }: OrderStatusProps) {
                     'text-xs font-medium text-center leading-tight',
                     isCompleted && 'text-amber-600',
                     isCurrent && 'text-amber-700 font-bold',
-                    isPending && 'text-gray-400'
+                    isPending && 'text-gray-400',
                   )}
                 >
                   {step.label}

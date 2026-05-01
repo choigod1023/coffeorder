@@ -12,6 +12,7 @@ import { OrderItem, OrderStatus } from '@/types';
 
 export interface FirebaseOrder {
   id: string;
+  customerName: string;
   items: OrderItem[];
   totalPrice: number;
   status: OrderStatus;
@@ -20,11 +21,13 @@ export interface FirebaseOrder {
 
 export async function createOrder(
   id: string,
+  customerName: string,
   items: OrderItem[],
   totalPrice: number,
 ): Promise<void> {
   await setDoc(doc(db, 'orders', id), {
     id,
+    customerName,
     items,
     totalPrice,
     status: 'pending',
@@ -34,6 +37,10 @@ export async function createOrder(
 
 export async function updateOrderStatus(id: string, status: OrderStatus): Promise<void> {
   await updateDoc(doc(db, 'orders', id), { status });
+}
+
+export async function cancelOrder(id: string): Promise<void> {
+  await updateDoc(doc(db, 'orders', id), { status: 'cancelled' });
 }
 
 export function subscribeToOrder(
@@ -51,5 +58,18 @@ export function subscribeToAllOrders(
   const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, (snap) => {
     callback(snap.docs.map((d) => d.data() as FirebaseOrder));
+  });
+}
+
+export function subscribeToWaitQueueCount(
+  callback: (count: number) => void,
+): () => void {
+  const q = query(collection(db, 'orders'), orderBy('createdAt', 'asc'));
+  return onSnapshot(q, (snap) => {
+    const count = snap.docs.filter((d) => {
+      const s = d.data().status as OrderStatus;
+      return s === 'paid' || s === 'preparing';
+    }).length;
+    callback(count);
   });
 }

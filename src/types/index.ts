@@ -1,14 +1,24 @@
+export type MenuOption = 'hot' | 'ice';
+
 export interface MenuItem {
   id: string;
   name: string;
   price: number;
   description?: string;
-  imageUrl?: string;
   category?: string;
+  availableOptions: MenuOption[];
+  beanName?: string;
+  cupNotes?: string;
+  intro?: string;
 }
 
-export interface CartItem extends MenuItem {
+export interface CartItem {
+  id: string;      // composite key: `${menuId}-${option}`
+  menuId: string;
+  name: string;    // e.g. "항상 (핫)"
+  price: number;
   quantity: number;
+  option: MenuOption;
 }
 
 export interface OrderItem {
@@ -16,6 +26,7 @@ export interface OrderItem {
   name: string;
   price: number;
   quantity: number;
+  option: MenuOption;
 }
 
 export interface CreateOrderRequest {
@@ -34,7 +45,8 @@ export type OrderStatus =
   | 'paid'
   | 'preparing'
   | 'ready'
-  | 'picked_up';
+  | 'picked_up'
+  | 'cancelled';
 
 export interface OrderStatusResponse {
   status: OrderStatus;
