@@ -2,7 +2,7 @@
 
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Coffee, Bell, X } from 'lucide-react';
+import { Coffee, Bell, X, CheckCircle2, Clock } from 'lucide-react';
 import { OrderStatus } from '@/types';
 import OrderStatusTracker from '@/components/OrderStatus';
 import { subscribeToOrder, cancelOrder, subscribeToWaitQueueCount, FirebaseOrder } from '@/lib/orders';
@@ -24,7 +24,7 @@ const STATUS_MESSAGES: Record<OrderStatus, string> = {
 const STATUS_BG: Record<OrderStatus, string> = {
   pending: 'bg-gray-100',
   paid: 'bg-blue-50',
-  preparing: 'bg-amber-50',
+  preparing: 'bg-sage-50',
   ready: 'bg-green-50',
   picked_up: 'bg-emerald-50',
   cancelled: 'bg-red-50',
@@ -35,6 +35,14 @@ function getWaitTimeText(count: number): string {
   if (count <= 2) return '약 6~10분';
   if (count <= 4) return '약 11~15분';
   return '약 15~20분';
+}
+
+function StatusIcon({ status }: { status: OrderStatus }) {
+  if (status === 'cancelled') return <X className="w-6 h-6 text-red-500" />;
+  if (status === 'preparing') return <Coffee className="w-6 h-6 text-sage-600 animate-pulse" />;
+  if (status === 'ready') return <Bell className="w-6 h-6 text-green-600" />;
+  if (status === 'picked_up') return <CheckCircle2 className="w-6 h-6 text-emerald-600" />;
+  return <Coffee className="w-6 h-6 text-sage-600" />;
 }
 
 export default function TrackPage({ params }: Props) {
@@ -78,16 +86,15 @@ export default function TrackPage({ params }: Props) {
   const canCancel = status === 'pending' || status === 'paid';
 
   return (
-    <div className="min-h-screen bg-amber-50 flex flex-col">
-      <header className="bg-white border-b border-amber-100 shadow-sm">
+    <div className="min-h-screen bg-sage-50 flex flex-col">
+      <header className="bg-white border-b border-sage-100 shadow-sm">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-2">
-          <Coffee className="w-5 h-5 text-amber-700" />
-          <h1 className="text-base font-bold text-amber-900">주문 현황</h1>
+          <Coffee className="w-5 h-5 text-sage-700" />
+          <h1 className="text-base font-bold text-sage-900">주문 현황</h1>
         </div>
       </header>
 
       <main className="flex-1 max-w-md mx-auto w-full px-4 py-6 flex flex-col gap-4">
-        {/* Ready banner */}
         {showReadyBanner && (
           <div className="bg-green-500 text-white rounded-2xl p-4 flex items-center gap-3 shadow-lg animate-in slide-in-from-top-4 duration-500">
             <Bell className="w-6 h-6 flex-shrink-0 animate-bounce" />
@@ -98,41 +105,28 @@ export default function TrackPage({ params }: Props) {
           </div>
         )}
 
-        {/* Order info */}
-        <div className="bg-white rounded-2xl border border-amber-100 shadow-sm px-5 py-4">
+        <div className="bg-white rounded-2xl border border-sage-100 shadow-sm px-5 py-4">
           {order?.customerName && (
-            <p className="font-bold text-amber-800 text-lg mb-1">{order.customerName}님의 주문</p>
+            <p className="font-bold text-sage-800 text-lg mb-1">{order.customerName}님의 주문</p>
           )}
           <p className="text-xs text-gray-500">주문번호</p>
           <p className="font-mono text-sm font-semibold text-gray-800">{id}</p>
         </div>
 
-        {/* Wait time — pending/paid 상태일 때만 */}
         {(status === 'pending' || status === 'paid') && (
-          <div className="bg-amber-100/60 border border-amber-200 rounded-xl px-4 py-3 flex items-center gap-3">
-            <span className="text-xl">⏱</span>
+          <div className="bg-sage-100/60 border border-sage-200 rounded-xl px-4 py-3 flex items-center gap-3">
+            <Clock className="w-5 h-5 text-sage-600 flex-shrink-0" />
             <div>
-              <p className="text-xs text-amber-700 font-medium">예상 대기 시간</p>
-              <p className="text-base font-bold text-amber-900">{getWaitTimeText(waitQueueCount)}</p>
+              <p className="text-xs text-sage-700 font-medium">예상 대기 시간</p>
+              <p className="text-base font-bold text-sage-900">{getWaitTimeText(waitQueueCount)}</p>
             </div>
           </div>
         )}
 
-        {/* Status card */}
         <div className={cn('rounded-2xl border border-transparent shadow-sm p-5 transition-colors duration-500', STATUS_BG[status])}>
           <div className="flex items-start gap-4 mb-5">
             <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center flex-shrink-0">
-              {status === 'cancelled' ? (
-                <span className="text-2xl">❌</span>
-              ) : status === 'preparing' ? (
-                <span className="text-2xl animate-pulse">☕</span>
-              ) : status === 'ready' ? (
-                <span className="text-2xl">🎉</span>
-              ) : status === 'picked_up' ? (
-                <span className="text-2xl">✅</span>
-              ) : (
-                <Coffee className="w-6 h-6 text-amber-600" />
-              )}
+              <StatusIcon status={status} />
             </div>
             <div>
               <h2 className="font-bold text-gray-900 text-base">{STATUS_MESSAGES[status]}</h2>
@@ -141,17 +135,15 @@ export default function TrackPage({ params }: Props) {
           <OrderStatusTracker status={status} />
         </div>
 
-        {/* Cancel button */}
         {canCancel && (
           <button
             onClick={() => setShowCancelModal(true)}
-            className="w-full py-3 rounded-xl border-2 border-red-200 text-red-500 text-sm font-medium hover:bg-red-50 transition-colors"
+            className="w-full py-4 rounded-xl border-2 border-red-200 text-red-500 text-sm font-medium hover:bg-red-50 transition-colors"
           >
             주문 취소 요청
           </button>
         )}
 
-        {/* Live indicator */}
         {status !== 'picked_up' && status !== 'cancelled' && (
           <div className="flex items-center justify-center gap-2 text-gray-400 text-xs">
             <div className="w-3 h-3 border border-gray-300 border-t-transparent rounded-full animate-spin" />
@@ -159,9 +151,8 @@ export default function TrackPage({ params }: Props) {
           </div>
         )}
 
-        {/* Order items */}
         {order?.items && (
-          <div className="bg-white rounded-2xl border border-amber-100 shadow-sm px-5 py-4">
+          <div className="bg-white rounded-2xl border border-sage-100 shadow-sm px-5 py-4">
             <p className="text-xs text-gray-500 font-medium mb-2">주문 내역</p>
             {order.items.map((item, i) => (
               <div key={i} className="flex justify-between text-sm py-1">
@@ -171,14 +162,14 @@ export default function TrackPage({ params }: Props) {
             ))}
             <div className="flex justify-between text-sm font-bold pt-2 border-t border-gray-100 mt-1">
               <span className="text-gray-700">합계</span>
-              <span className="text-amber-700">{order.totalPrice.toLocaleString('ko-KR')}원</span>
+              <span className="text-sage-700">{order.totalPrice.toLocaleString('ko-KR')}원</span>
             </div>
           </div>
         )}
 
-        <div className="bg-amber-100/50 rounded-xl p-4">
-          <p className="text-xs text-amber-800 font-medium mb-1">안내</p>
-          <ul className="text-xs text-amber-700 space-y-1">
+        <div className="bg-sage-100/50 rounded-xl p-4">
+          <p className="text-xs text-sage-800 font-medium mb-1">안내</p>
+          <ul className="text-xs text-sage-700 space-y-1">
             <li>• 음료 준비 시 알림이 표시됩니다</li>
             <li>• 이 화면을 닫지 마세요</li>
             <li>• 수령 후 자동으로 다음 페이지로 이동합니다</li>
@@ -186,7 +177,6 @@ export default function TrackPage({ params }: Props) {
         </div>
       </main>
 
-      {/* Cancel confirm modal */}
       {showCancelModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div
@@ -205,14 +195,14 @@ export default function TrackPage({ params }: Props) {
               <button
                 onClick={() => setShowCancelModal(false)}
                 disabled={isCancelling}
-                className="flex-1 py-3 rounded-xl border-2 border-gray-200 text-gray-500 font-bold text-sm hover:bg-gray-50 disabled:opacity-50"
+                className="flex-1 py-4 rounded-xl border-2 border-gray-200 text-gray-500 font-bold text-sm hover:bg-gray-50 disabled:opacity-50"
               >
                 돌아가기
               </button>
               <button
                 onClick={handleCancel}
                 disabled={isCancelling}
-                className="flex-1 py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 py-4 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {isCancelling ? (
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

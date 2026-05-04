@@ -131,29 +131,29 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-amber-50">
+    <div className="min-h-screen bg-sage-50">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-white border-b border-amber-100 shadow-sm">
+      <header className="sticky top-0 z-40 bg-white border-b border-sage-100 shadow-sm">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Coffee className="w-6 h-6 text-amber-700" />
-            <h1 className="text-base font-bold text-amber-900 leading-tight">상록수커피클럽</h1>
+            <Coffee className="w-6 h-6 text-sage-700" />
+            <h1 className="text-base font-bold text-sage-900 leading-tight">상록수커피클럽</h1>
           </div>
           <div className="flex items-center gap-1">
             <button
               onClick={() => router.push('/info')}
-              className="p-2 rounded-full hover:bg-amber-50 transition-colors"
+              className="p-2 rounded-full hover:bg-sage-50 transition-colors"
               aria-label="부스 안내"
             >
-              <Info className="w-5 h-5 text-amber-600" />
+              <Info className="w-5 h-5 text-sage-600" />
             </button>
             <button
               onClick={() => setIsCartOpen(true)}
-              className="relative p-2 rounded-full hover:bg-amber-50 transition-colors"
+              className="relative p-2 rounded-full hover:bg-sage-50 transition-colors"
             >
-              <ShoppingCart className="w-5 h-5 text-amber-700" />
+              <ShoppingCart className="w-5 h-5 text-sage-700" />
               {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-amber-600 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-sage-600 text-white text-xs rounded-full flex items-center justify-center font-bold">
                   {totalItems > 9 ? '9+' : totalItems}
                 </span>
               )}
@@ -165,10 +165,10 @@ export default function HomePage() {
       {/* Main content */}
       <main className="max-w-2xl mx-auto px-4 pb-32">
         {/* Hero */}
-        <div className="mt-4 mb-5 rounded-2xl bg-gradient-to-r from-amber-800 to-amber-500 p-6 text-white">
-          <p className="text-amber-200 text-sm font-medium mb-1">상록수커피클럽</p>
-          <h2 className="text-2xl font-bold">원하는 음료를<br />선택해주세요</h2>
-          <p className="text-amber-200 text-xs mt-2">전 메뉴 4,000원</p>
+        <div className="mt-4 mb-5 rounded-2xl bg-gradient-to-r from-sage-800 to-sage-500 p-6 text-white">
+          <p className="text-sage-200 text-sm font-medium mb-1">상록수커피클럽</p>
+          <h2 className="text-2xl font-bold">음료를 고르고<br />토스로 결제하면</h2>
+          <p className="text-sage-200 text-sm mt-2">준비되는 동안 실시간으로 알려드려요</p>
         </div>
 
         {/* 10잔 제한 안내 */}
@@ -195,14 +195,14 @@ export default function HomePage() {
 
       {/* Sticky cart bar */}
       {totalItems > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-amber-100 shadow-lg">
+        <div className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-sage-100 shadow-lg">
           <div className="max-w-2xl mx-auto px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
             <button
               onClick={() => setIsCartOpen(true)}
-              className="w-full bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white rounded-2xl py-5 px-5 flex items-center justify-between transition-colors"
+              className="w-full bg-sage-600 hover:bg-sage-700 active:bg-sage-800 text-white rounded-2xl py-5 px-5 flex items-center justify-between transition-colors"
             >
               <span className="flex items-center gap-3">
-                <span className="bg-amber-500 text-white rounded-full w-7 h-7 flex items-center justify-center text-sm font-bold">
+                <span className="bg-sage-500 text-white rounded-full w-7 h-7 flex items-center justify-center text-sm font-bold">
                   {totalItems}
                 </span>
                 <span className="font-bold text-base">장바구니 보기</span>
@@ -224,8 +224,8 @@ export default function HomePage() {
             <div className="flex justify-center pt-3 pb-1">
               <div className="w-10 h-1 bg-gray-200 rounded-full" />
             </div>
-            <div className="flex items-center justify-between px-5 py-3 border-b border-amber-100">
-              <h2 className="text-lg font-bold text-amber-900">장바구니</h2>
+            <div className="flex items-center justify-between px-5 py-3 border-b border-sage-100">
+              <h2 className="text-lg font-bold text-sage-900">장바구니</h2>
               <button
                 onClick={() => setIsCartOpen(false)}
                 className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
@@ -259,16 +259,16 @@ export default function HomePage() {
               )}
             </div>
             {cart.length > 0 && (
-              <div className="px-5 py-4 border-t border-amber-100 bg-amber-50/50">
+              <div className="px-5 py-4 border-t border-sage-100 bg-sage-50/50">
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-gray-600 font-medium">총 금액</span>
-                  <span className="text-xl font-bold text-amber-800">
+                  <span className="text-xl font-bold text-sage-800">
                     {totalPrice.toLocaleString('ko-KR')}원
                   </span>
                 </div>
                 <button
                   onClick={handleOrderClick}
-                  className="w-full bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white rounded-2xl py-5 font-bold text-base transition-colors"
+                  className="w-full bg-sage-600 hover:bg-sage-700 active:bg-sage-800 text-white rounded-2xl py-5 font-bold text-base transition-colors"
                 >
                   주문하기 ({totalItems}잔)
                 </button>
@@ -287,8 +287,8 @@ export default function HomePage() {
           />
           <div className="relative bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm">
             <div className="text-center mb-5">
-              <div className="w-14 h-14 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <span className="text-2xl">☕</span>
+              <div className="w-14 h-14 bg-sage-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Coffee className="w-6 h-6 text-sage-600" />
               </div>
               <h2 className="text-lg font-bold text-gray-900">이름을 알려주세요</h2>
               <p className="text-sm text-gray-500 mt-1">음료 준비 시 이름으로 불러드려요</p>
@@ -301,7 +301,7 @@ export default function HomePage() {
               placeholder="이름 입력 (최대 5자)"
               maxLength={5}
               autoFocus
-              className="w-full border-2 border-amber-200 focus:border-amber-500 rounded-xl px-4 py-4 text-base text-gray-800 placeholder-gray-400 outline-none transition-colors text-center font-semibold"
+              className="w-full border-2 border-sage-200 focus:border-sage-500 rounded-xl px-4 py-4 text-base text-gray-800 placeholder-gray-400 outline-none transition-colors text-center font-semibold"
             />
             {nameError && (
               <p className="text-red-500 text-xs text-center mt-1.5">{nameError}</p>
@@ -317,7 +317,7 @@ export default function HomePage() {
               <button
                 onClick={handleConfirmOrder}
                 disabled={isOrdering || !customerName.trim()}
-                className="flex-1 py-4 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm transition-colors disabled:bg-amber-300 flex items-center justify-center gap-2"
+                className="flex-1 py-4 rounded-xl bg-sage-600 hover:bg-sage-700 text-white font-bold text-sm transition-colors disabled:bg-sage-300 flex items-center justify-center gap-2"
               >
                 {isOrdering ? (
                   <>

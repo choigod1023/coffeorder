@@ -12,27 +12,27 @@ interface CartItemProps {
 
 export default function CartItem({ item, onIncrement, onDecrement, onDelete }: CartItemProps) {
   return (
-    <div className="flex items-center gap-3 py-4 border-b border-amber-100 last:border-0">
-      <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center text-2xl flex-shrink-0">
-        {item.option === 'hot' ? '☕' : '🧊'}
+    <div className="flex items-center gap-3 py-4 border-b border-sage-100 last:border-0">
+      <div className="w-12 h-12 bg-sage-100 rounded-xl flex items-center justify-center flex-shrink-0">
+        <span className="text-xs font-bold text-sage-700">{item.option === 'hot' ? '핫' : '냉'}</span>
       </div>
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-gray-800 text-base truncate">{item.name}</p>
-        <p className="text-amber-700 text-base font-bold mt-0.5">
+        <p className="text-sage-700 text-base font-bold mt-0.5">
           {(item.price * item.quantity).toLocaleString('ko-KR')}원
         </p>
       </div>
       <div className="flex items-center gap-2 flex-shrink-0">
         <button
           onClick={() => onDecrement(item.id)}
-          className="w-11 h-11 rounded-xl border-2 border-amber-300 flex items-center justify-center text-amber-700 hover:bg-amber-50 active:bg-amber-100 transition-colors"
+          className="w-11 h-11 rounded-xl border-2 border-sage-300 flex items-center justify-center text-sage-700 hover:bg-sage-50 active:bg-sage-100 transition-colors"
         >
           <Minus className="w-4 h-4" />
         </button>
-        <span className="font-bold text-amber-800 text-lg min-w-[1.75rem] text-center">{item.quantity}</span>
+        <span className="font-bold text-sage-800 text-lg min-w-[1.75rem] text-center">{item.quantity}</span>
         <button
           onClick={() => onIncrement(item.id)}
-          className="w-11 h-11 rounded-xl bg-amber-600 flex items-center justify-center text-white hover:bg-amber-700 active:bg-amber-800 transition-colors"
+          className="w-11 h-11 rounded-xl bg-sage-600 flex items-center justify-center text-white hover:bg-sage-700 active:bg-sage-800 transition-colors"
         >
           <Plus className="w-4 h-4" />
         </button>
