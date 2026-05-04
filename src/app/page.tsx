@@ -1,50 +1,20 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { MenuItem as MenuItemType, CartItem, MenuOption } from '@/types';
+import { CartItem, MenuItem, MenuOption } from '@/types';
 import MenuItemCard from '@/components/MenuItem';
 import CartItemCard from '@/components/CartItem';
-import { ShoppingCart, Coffee, X, Info } from 'lucide-react';
-import { createOrder } from '@/lib/orders';
+import { ShoppingCart, X, Info, Plus, Minus, Check } from 'lucide-react';
+import { createOrder, getOrderStatus } from '@/lib/orders';
+import { MENU } from '@/lib/menu';
+import { getCart, saveCart } from '@/lib/cart';
+import { getActiveOrder, saveActiveOrder, clearActiveOrder, ActiveOrderInfo } from '@/lib/activeOrder';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const MAX_ITEMS = 10;
-
-const MENU: MenuItemType[] = [
-  {
-    id: 'hangsang',
-    name: '항상',
-    price: 4000,
-    description: '고소한 원두로 내린 커피',
-    category: '커피',
-    availableOptions: ['hot', 'ice'],
-    beanName: '(원두 정보 업데이트 예정)',
-    cupNotes: '',
-    intro: '',
-  },
-  {
-    id: 'pureun',
-    name: '푸른',
-    price: 4000,
-    description: '산미 있는 원두로 내린 커피',
-    category: '커피',
-    availableOptions: ['hot', 'ice'],
-    beanName: '(원두 정보 업데이트 예정)',
-    cupNotes: '',
-    intro: '',
-  },
-  {
-    id: 'namu',
-    name: '나무',
-    price: 4000,
-    description: '논커피 메뉴 (아이스 단일)',
-    category: '논커피',
-    availableOptions: ['ice'],
-    beanName: '',
-    cupNotes: '',
-    intro: '',
-  },
-];
+const OPTION_LABEL: Record<MenuOption, string> = { hot: '핫', ice: '아이스' };
 
 export default function HomePage() {
   const router = useRouter();
@@ -55,27 +25,44 @@ export default function HomePage() {
   const [customerName, setCustomerName] = useState('');
   const [nameError, setNameError] = useState('');
 
+  const [activeOrder, setActiveOrder] = useState<ActiveOrderInfo | null>(null);
+
+  // 메뉴 상세 모달 상태
+  const [selectedMenu, setSelectedMenu] = useState<MenuItem | null>(null);
+  const [modalOption, setModalOption] = useState<MenuOption>('ice');
+  const [addQty, setAddQty] = useState(1);
+  const [justAdded, setJustAdded] = useState(false);
+
+  useEffect(() => {
+    setCart(getCart());
+    const stored = getActiveOrder();
+    if (stored) {
+      getOrderStatus(stored.orderId).then((status) => {
+        if (!status || status === 'picked_up' || status === 'cancelled') {
+          clearActiveOrder();
+        } else {
+          setActiveOrder(stored);
+        }
+      });
+    }
+  }, []);
+
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const isAtLimit = totalItems >= MAX_ITEMS;
+  const remainingSlots = MAX_ITEMS - totalItems;
 
-  const addToCart = useCallback((item: MenuItemType, option: MenuOption) => {
-    setCart((prev) => {
-      if (prev.reduce((s, c) => s + c.quantity, 0) >= MAX_ITEMS) return prev;
-      const cartId = `${item.id}-${option}`;
-      const displayName = `${item.name} (${option === 'hot' ? '핫' : '아이스'})`;
-      const existing = prev.find((c) => c.id === cartId);
-      if (existing) {
-        return prev.map((c) => c.id === cartId ? { ...c, quantity: c.quantity + 1 } : c);
-      }
-      return [...prev, { id: cartId, menuId: item.id, name: displayName, price: item.price, quantity: 1, option }];
-    });
+  const updateCart = useCallback((next: CartItem[]) => {
+    setCart(next);
+    saveCart(next);
   }, []);
 
   const incrementCart = useCallback((cartId: string) => {
     setCart((prev) => {
       if (prev.reduce((s, c) => s + c.quantity, 0) >= MAX_ITEMS) return prev;
-      return prev.map((c) => c.id === cartId ? { ...c, quantity: c.quantity + 1 } : c);
+      const next = prev.map((c) => c.id === cartId ? { ...c, quantity: c.quantity + 1 } : c);
+      saveCart(next);
+      return next;
     });
   }, []);
 
@@ -83,17 +70,61 @@ export default function HomePage() {
     setCart((prev) => {
       const existing = prev.find((c) => c.id === cartId);
       if (!existing) return prev;
-      if (existing.quantity <= 1) return prev.filter((c) => c.id !== cartId);
-      return prev.map((c) => c.id === cartId ? { ...c, quantity: c.quantity - 1 } : c);
+      const next = existing.quantity <= 1
+        ? prev.filter((c) => c.id !== cartId)
+        : prev.map((c) => c.id === cartId ? { ...c, quantity: c.quantity - 1 } : c);
+      saveCart(next);
+      return next;
     });
   }, []);
 
   const deleteFromCart = useCallback((cartId: string) => {
-    setCart((prev) => prev.filter((c) => c.id !== cartId));
+    setCart((prev) => {
+      const next = prev.filter((c) => c.id !== cartId);
+      saveCart(next);
+      return next;
+    });
   }, []);
 
-  const getOptionQty = (menuId: string, option: MenuOption): number =>
-    cart.find((c) => c.id === `${menuId}-${option}`)?.quantity ?? 0;
+  const getMenuCartQty = (menuId: string): number =>
+    cart.filter((c) => c.menuId === menuId).reduce((s, c) => s + c.quantity, 0);
+
+  // 메뉴 모달 열기
+  const openMenuModal = useCallback((item: MenuItem) => {
+    setSelectedMenu(item);
+    setModalOption(item.availableOptions[0]);
+    setAddQty(1);
+    setJustAdded(false);
+  }, []);
+
+  const closeMenuModal = useCallback(() => {
+    if (justAdded) return;
+    setSelectedMenu(null);
+  }, [justAdded]);
+
+  // 모달에서 담기
+  const handleModalAdd = useCallback(() => {
+    if (!selectedMenu || isAtLimit) return;
+    const cartId = `${selectedMenu.id}-${modalOption}`;
+    const displayName = `${selectedMenu.name} (${modalOption === 'hot' ? '핫' : '아이스'})`;
+    const actualAdd = Math.min(addQty, remainingSlots);
+
+    setCart((prev) => {
+      const existing = prev.find((c) => c.id === cartId);
+      const next = existing
+        ? prev.map((c) => c.id === cartId ? { ...c, quantity: c.quantity + actualAdd } : c)
+        : [...prev, { id: cartId, menuId: selectedMenu.id, name: displayName, price: selectedMenu.price, quantity: actualAdd, option: modalOption }];
+      saveCart(next);
+      return next;
+    });
+
+    setJustAdded(true);
+    setTimeout(() => {
+      setJustAdded(false);
+      setSelectedMenu(null);
+      setAddQty(1);
+    }, 800);
+  }, [selectedMenu, modalOption, addQty, isAtLimit, remainingSlots]);
 
   const handleOrderClick = () => {
     if (cart.length === 0) return;
@@ -105,7 +136,7 @@ export default function HomePage() {
 
   const handleConfirmOrder = async () => {
     const trimmed = customerName.trim();
-    if (!trimmed) { setNameError('이름을 입력해주세요'); return; }
+    if (!trimmed) { setNameError('실명을 입력해주세요'); return; }
     if (trimmed.length > 5) { setNameError('이름은 5자 이하로 입력해주세요'); return; }
     setNameError('');
     setIsOrdering(true);
@@ -119,9 +150,10 @@ export default function HomePage() {
         option: item.option,
       }));
       await createOrder(orderId, trimmed, items, totalPrice);
+      saveActiveOrder({ orderId, total: totalPrice, name: trimmed });
       setShowNameModal(false);
-      setCart([]);
-      router.push(`/order/${orderId}?total=${totalPrice}`);
+      updateCart([]);
+      router.push(`/order/${orderId}?total=${totalPrice}&name=${encodeURIComponent(trimmed)}`);
     } catch (e) {
       console.error(e);
       alert('주문 생성에 실패했습니다. 다시 시도해주세요.');
@@ -135,10 +167,10 @@ export default function HomePage() {
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white border-b border-sage-100 shadow-sm">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Coffee className="w-6 h-6 text-sage-700" />
+          <Link href="/" className="flex items-center gap-2">
+            <Image src="/logo-nav.png" alt="상록수커피클럽" width={40} height={40} className="object-contain" />
             <h1 className="text-base font-bold text-sage-900 leading-tight">상록수커피클럽</h1>
-          </div>
+          </Link>
           <div className="flex items-center gap-1">
             <button
               onClick={() => router.push('/info')}
@@ -162,32 +194,51 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Main content */}
+      {/* Main */}
       <main className="max-w-2xl mx-auto px-4 pb-32">
+        {/* 진행 중인 주문 배너 */}
+        {activeOrder && (
+          <Link
+            href={`/track/${activeOrder.orderId}`}
+            className="mt-4 flex items-center justify-between gap-3 bg-sage-800 text-white rounded-2xl px-4 py-3.5 shadow-md active:scale-[0.98] transition-transform"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-sage-600 rounded-full flex items-center justify-center shrink-0">
+                <div className="w-2.5 h-2.5 bg-white rounded-full animate-pulse" />
+              </div>
+              <div>
+                <p className="text-xs text-sage-300 font-medium">진행 중인 주문</p>
+                <p className="text-sm font-bold">{activeOrder.name}님 · {activeOrder.total.toLocaleString('ko-KR')}원</p>
+              </div>
+            </div>
+            <span className="text-xs text-sage-300 shrink-0">현황 보기 →</span>
+          </Link>
+        )}
+
         {/* Hero */}
-        <div className="mt-4 mb-5 rounded-2xl bg-gradient-to-r from-sage-800 to-sage-500 p-6 text-white">
-          <p className="text-sage-200 text-sm font-medium mb-1">상록수커피클럽</p>
-          <h2 className="text-2xl font-bold">음료를 고르고<br />토스로 결제하면</h2>
-          <p className="text-sage-200 text-sm mt-2">준비되는 동안 실시간으로 알려드려요</p>
+        <div className="mt-4 mb-5 rounded-2xl bg-gradient-to-r from-sage-600 to-sage-400 p-6 text-white flex items-center gap-5">
+          <Image src="/logo.png" alt="상록수커피클럽" width={80} height={80} className="rounded-full shrink-0 border-2 border-white/30" />
+          <div>
+            <p className="text-white/70 text-sm font-medium mb-1">상록수커피클럽</p>
+            <h2 className="text-xl font-bold leading-snug">음료를 고르고<br />토스로 결제하면</h2>
+            <p className="text-white/70 text-xs mt-1.5">준비되는 동안 실시간으로 알려드려요</p>
+          </div>
         </div>
 
-        {/* 10잔 제한 안내 */}
         {isAtLimit && (
           <div className="mb-4 bg-orange-50 border border-orange-200 rounded-xl px-4 py-3 text-sm text-orange-700 font-medium text-center">
             10잔 이상 주문은 카운터로 문의해주세요
           </div>
         )}
 
-        {/* Menu */}
-        <div className="grid grid-cols-1 gap-4">
+        {/* Gallery grid */}
+        <div className="grid grid-cols-2 gap-3">
           {MENU.map((item) => (
             <MenuItemCard
               key={item.id}
               item={item}
-              getOptionQty={(opt) => getOptionQty(item.id, opt)}
-              onAdd={(opt) => addToCart(item, opt)}
-              onRemove={(opt) => decrementCart(`${item.id}-${opt}`)}
-              isAtLimit={isAtLimit}
+              cartQty={getMenuCartQty(item.id)}
+              onPress={() => openMenuModal(item)}
             />
           ))}
         </div>
@@ -213,7 +264,115 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Cart drawer */}
+      {/* 메뉴 상세 바텀시트 */}
+      {selectedMenu && (
+        <div className="fixed inset-0 z-50 flex flex-col justify-end">
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={closeMenuModal}
+          />
+          <div className="relative bg-white rounded-t-3xl shadow-2xl max-h-[85vh] flex flex-col">
+            <div className="flex justify-center pt-3 pb-1 shrink-0">
+              <div className="w-10 h-1 bg-gray-200 rounded-full" />
+            </div>
+
+            {/* 스크롤 영역 */}
+            <div className="overflow-y-auto flex-1">
+              <div className="h-48 bg-gradient-to-br from-sage-600 to-sage-400 flex items-center justify-center">
+                <span className="text-8xl">{selectedMenu.category === '논커피' ? '🌿' : '☕'}</span>
+              </div>
+
+              <div className="px-5 py-4 pb-2">
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <h2 className="text-xl font-bold text-gray-900">{selectedMenu.name}</h2>
+                  {selectedMenu.category && (
+                    <span className="text-xs text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full shrink-0">{selectedMenu.category}</span>
+                  )}
+                </div>
+                <p className="text-sage-600 font-bold text-lg mb-3">{selectedMenu.price.toLocaleString('ko-KR')}원</p>
+
+                {selectedMenu.description && (
+                  <p className="text-gray-600 text-sm mb-3 leading-relaxed">{selectedMenu.description}</p>
+                )}
+                {selectedMenu.beanName && (
+                  <div className="bg-sage-50 rounded-xl border border-sage-200 px-4 py-3 mb-2">
+                    <p className="text-xs text-sage-600 font-medium mb-0.5">원두</p>
+                    <p className="text-sm text-gray-800 font-semibold">{selectedMenu.beanName}</p>
+                  </div>
+                )}
+                {selectedMenu.cupNotes && (
+                  <div className="bg-sage-50 rounded-xl border border-sage-200 px-4 py-3 mb-2">
+                    <p className="text-xs text-sage-600 font-medium mb-0.5">컵 노트</p>
+                    <p className="text-sm text-gray-800">{selectedMenu.cupNotes}</p>
+                  </div>
+                )}
+                {selectedMenu.intro && (
+                  <p className="text-gray-500 text-sm leading-relaxed mt-1">{selectedMenu.intro}</p>
+                )}
+              </div>
+            </div>
+
+            {/* 고정 하단 CTA */}
+            <div className="shrink-0 px-5 py-4 border-t border-sage-100 bg-white pb-[calc(1rem+env(safe-area-inset-bottom))]">
+              {selectedMenu.availableOptions.length > 1 && (
+                <div className="flex rounded-xl overflow-hidden border border-sage-200 mb-3">
+                  {selectedMenu.availableOptions.map((opt) => (
+                    <button
+                      key={opt}
+                      onClick={() => setModalOption(opt)}
+                      className={`flex-1 py-3 text-sm font-semibold transition-colors ${
+                        modalOption === opt
+                          ? 'bg-sage-600 text-white'
+                          : 'bg-white text-gray-500 hover:bg-sage-50'
+                      }`}
+                    >
+                      {OPTION_LABEL[opt]}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex items-center gap-3">
+                <div className="flex items-center border-2 border-sage-200 rounded-xl overflow-hidden shrink-0">
+                  <button
+                    onClick={() => setAddQty((q) => Math.max(q - 1, 1))}
+                    disabled={addQty <= 1}
+                    className="w-11 h-12 flex items-center justify-center text-sage-700 hover:bg-sage-50 disabled:text-gray-300 transition-colors"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+                  <span className="w-10 text-center font-bold text-sage-800 text-base">{addQty}</span>
+                  <button
+                    onClick={() => setAddQty((q) => Math.min(q + 1, Math.max(remainingSlots, 1)))}
+                    disabled={isAtLimit || addQty >= remainingSlots}
+                    className="w-11 h-12 flex items-center justify-center text-sage-700 hover:bg-sage-50 disabled:text-gray-300 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <button
+                  onClick={handleModalAdd}
+                  disabled={isAtLimit || justAdded}
+                  className={`flex-1 h-12 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all duration-200 ${
+                    justAdded
+                      ? 'bg-sage-100 text-sage-700 border-2 border-sage-300'
+                      : 'bg-sage-600 hover:bg-sage-700 active:bg-sage-800 text-white disabled:bg-gray-200 disabled:text-gray-400'
+                  }`}
+                >
+                  {justAdded ? (
+                    <><Check className="w-4 h-4" /> 담겼습니다</>
+                  ) : (
+                    <><Plus className="w-4 h-4" /> 장바구니에 담기</>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 장바구니 드로어 */}
       {isCartOpen && (
         <div className="fixed inset-0 z-50 flex flex-col justify-end">
           <div
@@ -278,7 +437,7 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Name modal */}
+      {/* 실명 입력 모달 */}
       {showNameModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div
@@ -287,18 +446,18 @@ export default function HomePage() {
           />
           <div className="relative bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm">
             <div className="text-center mb-5">
-              <div className="w-14 h-14 bg-sage-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Coffee className="w-6 h-6 text-sage-600" />
+              <div className="mx-auto mb-3 w-14 h-14">
+                <Image src="/logo.png" alt="상록수커피클럽" width={56} height={56} className="rounded-full" />
               </div>
-              <h2 className="text-lg font-bold text-gray-900">이름을 알려주세요</h2>
-              <p className="text-sm text-gray-500 mt-1">음료 준비 시 이름으로 불러드려요</p>
+              <h2 className="text-lg font-bold text-gray-900">실명을 입력해주세요</h2>
+              <p className="text-sm text-gray-500 mt-1">음료 수령 시 실명으로 확인합니다</p>
             </div>
             <input
               type="text"
               value={customerName}
               onChange={(e) => { setCustomerName(e.target.value); setNameError(''); }}
               onKeyDown={(e) => { if (e.key === 'Enter') handleConfirmOrder(); }}
-              placeholder="이름 입력 (최대 5자)"
+              placeholder="실명 입력 (최대 5자)"
               maxLength={5}
               autoFocus
               className="w-full border-2 border-sage-200 focus:border-sage-500 rounded-xl px-4 py-4 text-base text-gray-800 placeholder-gray-400 outline-none transition-colors text-center font-semibold"

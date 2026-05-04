@@ -3,9 +3,11 @@
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Coffee, Bell, X, CheckCircle2, Clock } from 'lucide-react';
+import Link from 'next/link';
 import { OrderStatus } from '@/types';
 import OrderStatusTracker from '@/components/OrderStatus';
 import { subscribeToOrder, cancelOrder, subscribeToWaitQueueCount, FirebaseOrder } from '@/lib/orders';
+import { clearActiveOrder } from '@/lib/activeOrder';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -58,6 +60,9 @@ export default function TrackPage({ params }: Props) {
     const unsubscribe = subscribeToOrder(id, (o) => {
       setOrder(o);
       if (o.status === 'ready') setShowReadyBanner(true);
+      if (o.status === 'picked_up' || o.status === 'cancelled') {
+        clearActiveOrder();
+      }
       if (o.status === 'picked_up') {
         setTimeout(() => router.push(`/complete/${id}`), 1500);
       }
@@ -89,8 +94,10 @@ export default function TrackPage({ params }: Props) {
     <div className="min-h-screen bg-sage-50 flex flex-col">
       <header className="bg-white border-b border-sage-100 shadow-sm">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-2">
-          <Coffee className="w-5 h-5 text-sage-700" />
-          <h1 className="text-base font-bold text-sage-900">주문 현황</h1>
+          <Link href="/" className="flex items-center gap-2">
+            <Coffee className="w-5 h-5 text-sage-700" />
+            <h1 className="text-base font-bold text-sage-900">주문 현황</h1>
+          </Link>
         </div>
       </header>
 

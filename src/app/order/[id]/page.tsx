@@ -4,6 +4,7 @@ import { use, useEffect, useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { QRCodeSVG } from 'qrcode.react';
 import { Coffee, CheckCircle2, Smartphone } from 'lucide-react';
+import Link from 'next/link';
 import { subscribeToOrder } from '@/lib/orders';
 import { OrderStatus } from '@/types';
 
@@ -20,14 +21,14 @@ const BANK_NAMES: Record<string, string> = {
   '090': '카카오뱅크', '092': '토스뱅크',
 };
 
-function buildTossUrl(amount: number): string {
+function buildTossUrl(amount: number, memo: string): string {
   const bankCode = process.env.NEXT_PUBLIC_TOSS_BANK_CODE ?? '';
   const account = process.env.NEXT_PUBLIC_TOSS_ACCOUNT_NO ?? '';
 
   if (!bankCode || !account) return 'supertoss://';
 
   const bankName = BANK_NAMES[bankCode] ?? bankCode;
-  return `supertoss://send?bank=${encodeURIComponent(bankName)}&accountNo=${account}&amount=${amount}`;
+  return `supertoss://send?bank=${encodeURIComponent(bankName)}&accountNo=${account}&amount=${amount}&memo=${encodeURIComponent(memo)}`;
 }
 
 function isMobileDevice() {
@@ -41,6 +42,7 @@ export default function OrderPage({ params }: Props) {
   const searchParams = useSearchParams();
   const totalParam = searchParams.get('total');
   const total = totalParam ? parseInt(totalParam) : 0;
+  const customerName = searchParams.get('name') ?? '';
 
   const [status, setStatus] = useState<OrderStatus>('pending');
   const [isPaid, setIsPaid] = useState(false);
@@ -62,19 +64,21 @@ export default function OrderPage({ params }: Props) {
   }, [id, router]);
 
   const handleOpenToss = useCallback(() => {
-    const tossUrl = buildTossUrl(total);
+    const tossUrl = buildTossUrl(total, customerName);
     window.location.href = tossUrl;
-  }, [total]);
+  }, [total, customerName]);
 
-  const tossUrl = buildTossUrl(total);
+  const tossUrl = buildTossUrl(total, customerName);
   const shortId = id.replace('order-', '').slice(-8);
 
   return (
     <div className="min-h-screen bg-sage-50 flex flex-col">
       <header className="bg-white border-b border-sage-100 shadow-sm">
         <div className="max-w-md mx-auto px-4 py-4 flex items-center gap-2">
-          <Coffee className="w-5 h-5 text-sage-700" />
-          <h1 className="text-base font-bold text-sage-900">결제</h1>
+          <Link href="/" className="flex items-center gap-2">
+            <Coffee className="w-5 h-5 text-sage-700" />
+            <h1 className="text-base font-bold text-sage-900">결제</h1>
+          </Link>
         </div>
       </header>
 
@@ -124,7 +128,7 @@ export default function OrderPage({ params }: Props) {
                 <QRCodeSVG
                   value={tossUrl}
                   size={220}
-                  fgColor="#3182F6"
+                  fgColor="#577050"
                   bgColor="#ffffff"
                   level="M"
                 />
@@ -133,7 +137,7 @@ export default function OrderPage({ params }: Props) {
               {isMobile && (
                 <button
                   onClick={handleOpenToss}
-                  className="w-full flex items-center justify-center gap-2.5 bg-[#3182F6] hover:bg-[#1b64da] active:bg-[#1554c1] text-white rounded-2xl py-4 font-bold text-base transition-colors"
+                  className="w-full flex items-center justify-center gap-2.5 bg-sage-600 hover:bg-sage-700 active:bg-sage-800 text-white rounded-2xl py-4 font-bold text-base transition-colors"
                 >
                   <Smartphone className="w-5 h-5" />
                   토스 앱으로 바로 송금

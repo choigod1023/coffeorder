@@ -4,6 +4,7 @@ import {
   setDoc,
   updateDoc,
   onSnapshot,
+  getDoc,
   collection,
   query,
   orderBy,
@@ -41,6 +42,12 @@ export async function updateOrderStatus(id: string, status: OrderStatus): Promis
 
 export async function cancelOrder(id: string): Promise<void> {
   await updateDoc(doc(db, 'orders', id), { status: 'cancelled' });
+}
+
+export async function getOrderStatus(id: string): Promise<OrderStatus | null> {
+  const snap = await getDoc(doc(db, 'orders', id));
+  if (!snap.exists()) return null;
+  return (snap.data() as FirebaseOrder).status;
 }
 
 export function subscribeToOrder(

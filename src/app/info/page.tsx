@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, MapPin, BookOpen, Coffee, ExternalLink } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 export default function InfoPage() {
   const router = useRouter();
@@ -16,20 +18,18 @@ export default function InfoPage() {
           >
             <ArrowLeft className="w-5 h-5 text-gray-600" />
           </button>
-          <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <Coffee className="w-5 h-5 text-sage-700" />
             <h1 className="text-base font-bold text-sage-900">상록수커피클럽 안내</h1>
-          </div>
+          </Link>
         </div>
       </header>
 
       <main className="max-w-md mx-auto px-4 py-6 flex flex-col gap-4">
-        <div className="bg-gradient-to-r from-sage-800 to-sage-500 rounded-2xl p-6 text-white text-center">
-          <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
-            <Coffee className="w-8 h-8 text-white" />
-          </div>
+        <div className="bg-gradient-to-r from-sage-600 to-sage-400 rounded-2xl p-6 text-white text-center">
+          <Image src="/logo.png" alt="상록수커피클럽" width={80} height={80} className="rounded-full mx-auto mb-3 border-2 border-white/30" />
           <h2 className="text-xl font-bold">상록수커피클럽</h2>
-          <p className="text-sage-200 text-sm mt-1">SCC · 동국대학교</p>
+          <p className="text-white/70 text-sm mt-1">SCC · 동국대학교</p>
         </div>
 
         <div className="bg-white rounded-2xl border border-sage-100 shadow-sm p-5">

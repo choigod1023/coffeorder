@@ -4,7 +4,10 @@ import { useEffect, useState } from 'react';
 import {
   Coffee, CheckCircle2, Bell, Package, Clock,
   ChevronDown, ChevronUp, Download, X as XIcon,
+  CreditCard,
 } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 import { subscribeToAllOrders, updateOrderStatus, cancelOrder, FirebaseOrder } from '@/lib/orders';
 import { OrderStatus } from '@/types';
 import { cn } from '@/lib/utils';
@@ -65,12 +68,11 @@ function OrderCard({ order, onCancel }: { order: FirebaseOrder; onCancel: (id: s
       'bg-white rounded-2xl border shadow-sm p-4 flex flex-col gap-3',
       isCancelled ? 'border-red-100 opacity-60' : 'border-gray-100',
     )}>
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="font-mono text-base font-bold text-gray-800">#{shortId}</span>
           {order.customerName && (
-            <span className="text-base font-bold text-amber-700">{order.customerName}</span>
+            <span className="text-base font-bold text-sage-700">{order.customerName}</span>
           )}
         </div>
         <span className="text-xs text-gray-400 flex items-center gap-1">
@@ -79,7 +81,6 @@ function OrderCard({ order, onCancel }: { order: FirebaseOrder; onCancel: (id: s
         </span>
       </div>
 
-      {/* Items */}
       <div className="bg-gray-50 rounded-xl px-3 py-2.5 space-y-1.5">
         {order.items.map((item, i) => (
           <div key={i} className="flex justify-between text-sm">
@@ -89,23 +90,21 @@ function OrderCard({ order, onCancel }: { order: FirebaseOrder; onCancel: (id: s
         ))}
         <div className="pt-1.5 border-t border-gray-200 flex justify-between text-sm font-bold">
           <span className="text-gray-700">합계</span>
-          <span className="text-amber-700">{order.totalPrice.toLocaleString('ko-KR')}원</span>
+          <span className="text-sage-700">{order.totalPrice.toLocaleString('ko-KR')}원</span>
         </div>
       </div>
 
-      {/* Cancelled label */}
       {isCancelled && (
         <div className="text-center text-sm font-bold text-red-500 py-1">취소된 주문</div>
       )}
 
-      {/* Action buttons */}
       {!isCancelled && (
         <div className="flex flex-col gap-2">
           {order.status === 'pending' && (
             <button
               onClick={() => advance('paid')}
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl py-3.5 text-sm font-bold transition-colors"
+              className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl py-4 text-sm font-bold transition-colors"
             >
               <CheckCircle2 className="w-5 h-5" />
               송금 확인 완료
@@ -115,7 +114,7 @@ function OrderCard({ order, onCancel }: { order: FirebaseOrder; onCancel: (id: s
             <button
               onClick={() => advance('preparing')}
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white rounded-xl py-3.5 text-sm font-bold transition-colors"
+              className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white rounded-xl py-4 text-sm font-bold transition-colors"
             >
               <Coffee className="w-5 h-5" />
               준비 시작
@@ -125,7 +124,7 @@ function OrderCard({ order, onCancel }: { order: FirebaseOrder; onCancel: (id: s
             <button
               onClick={() => advance('ready')}
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white rounded-xl py-3.5 text-sm font-bold transition-colors"
+              className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white rounded-xl py-4 text-sm font-bold transition-colors"
             >
               <Bell className="w-5 h-5" />
               픽업 오세요! 호출
@@ -135,7 +134,7 @@ function OrderCard({ order, onCancel }: { order: FirebaseOrder; onCancel: (id: s
             <button
               onClick={() => advance('picked_up')}
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl py-3.5 text-sm font-bold transition-colors"
+              className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl py-4 text-sm font-bold transition-colors"
             >
               <Package className="w-5 h-5" />
               수령 완료
@@ -145,7 +144,7 @@ function OrderCard({ order, onCancel }: { order: FirebaseOrder; onCancel: (id: s
             <button
               onClick={() => onCancel(order.id)}
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 border border-red-200 text-red-500 hover:bg-red-50 disabled:opacity-50 rounded-xl py-2.5 text-xs font-medium transition-colors"
+              className="w-full flex items-center justify-center gap-2 border border-red-200 text-red-500 hover:bg-red-50 disabled:opacity-50 rounded-xl py-3 text-sm font-medium transition-colors"
             >
               <XIcon className="w-4 h-4" />
               주문 취소
@@ -169,7 +168,7 @@ function KanbanColumn({
   onCancel: (id: string) => void;
 }) {
   return (
-    <div className="flex flex-col min-h-0 border-b lg:border-b-0 lg:border-r border-gray-100 last:border-0">
+    <div className="flex flex-col min-h-0 border-r border-gray-100 last:border-0">
       <div className={cn('flex items-center justify-between px-4 py-3 shrink-0', headerColor)}>
         <div className="flex items-center gap-2 font-bold text-sm">
           {icon}
@@ -181,7 +180,7 @@ function KanbanColumn({
           </span>
         )}
       </div>
-      <div className="flex-1 overflow-y-auto p-3 space-y-3 min-h-[120px] lg:min-h-0">
+      <div className="flex-1 overflow-y-auto p-3 space-y-3">
         {orders.length === 0 ? (
           <div className="flex items-center justify-center h-full min-h-[100px] text-gray-400 text-sm">
             {emptyText}
@@ -194,12 +193,36 @@ function KanbanColumn({
   );
 }
 
+type TabKey = 'pending' | 'active' | 'ready';
+
+const TAB_CONFIG: Record<TabKey, { label: string; color: string; activeColor: string; badgeColor: string }> = {
+  pending: {
+    label: '송금대기',
+    color: 'text-gray-500',
+    activeColor: 'text-blue-600 border-b-2 border-blue-600',
+    badgeColor: 'bg-blue-100 text-blue-700',
+  },
+  active: {
+    label: '준비중',
+    color: 'text-gray-500',
+    activeColor: 'text-amber-600 border-b-2 border-amber-600',
+    badgeColor: 'bg-amber-100 text-amber-700',
+  },
+  ready: {
+    label: '픽업대기',
+    color: 'text-gray-500',
+    activeColor: 'text-green-600 border-b-2 border-green-600',
+    badgeColor: 'bg-green-100 text-green-700',
+  },
+};
+
 export default function AdminPage() {
   const [orders, setOrders] = useState<FirebaseOrder[]>([]);
   const [connected, setConnected] = useState(false);
   const [showDone, setShowDone] = useState(false);
   const [cancelTargetId, setCancelTargetId] = useState<string | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabKey>('pending');
 
   useEffect(() => {
     const unsubscribe = subscribeToAllOrders((all) => {
@@ -230,15 +253,21 @@ export default function AdminPage() {
   const totalRevenue = completedOrders.reduce((sum, o) => sum + o.totalPrice, 0);
   const totalCups = completedOrders.reduce((sum, o) => o.items.reduce((s, i) => s + i.quantity, 0) + sum, 0);
 
+  const tabOrders: Record<TabKey, FirebaseOrder[]> = {
+    pending,
+    active,
+    ready,
+  };
+
   return (
     <div className="h-screen flex flex-col bg-gray-50 overflow-hidden">
       {/* Header */}
       <header className="shrink-0 bg-white border-b border-gray-200 shadow-sm">
         <div className="px-4 lg:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-amber-100 rounded-xl flex items-center justify-center">
-              <Coffee className="w-5 h-5 text-amber-700" />
-            </div>
+            <Link href="/" className="flex items-center gap-3">
+            <Image src="/logo.png" alt="상록수커피클럽" width={36} height={36} className="rounded-full" />
+            </Link>
             <div>
               <h1 className="text-base font-bold text-gray-900 leading-tight">관리자 대시보드</h1>
               <p className="text-xs text-gray-500">진행 중 {totalActive}건 · 완료 {completedOrders.length}건 · {totalRevenue.toLocaleString('ko-KR')}원</p>
@@ -252,17 +281,6 @@ export default function AdminPage() {
               <Download className="w-3.5 h-3.5" />
               장부 저장
             </button>
-            <div className="hidden lg:flex items-center gap-2">
-              <span className="bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full">
-                송금대기 {pending.length}
-              </span>
-              <span className="bg-amber-50 text-amber-700 text-xs font-semibold px-3 py-1.5 rounded-full">
-                준비중 {active.length}
-              </span>
-              <span className="bg-green-50 text-green-700 text-xs font-semibold px-3 py-1.5 rounded-full">
-                픽업대기 {ready.length}
-              </span>
-            </div>
             <div className="flex items-center gap-1.5">
               <div className={cn('w-2 h-2 rounded-full', connected ? 'bg-green-500 animate-pulse' : 'bg-gray-300')} />
               <span className="text-xs text-gray-500 hidden sm:inline">{connected ? '실시간 연결' : '연결 중...'}</span>
@@ -276,15 +294,56 @@ export default function AdminPage() {
           <span>·</span>
           <span>{totalCups}잔 제조</span>
           <span>·</span>
-          <span className="font-semibold text-amber-700">{totalRevenue.toLocaleString('ko-KR')}원</span>
+          <span className="font-semibold text-sage-700">{totalRevenue.toLocaleString('ko-KR')}원</span>
+        </div>
+
+        {/* 모바일 탭 */}
+        <div className="flex lg:hidden border-t border-gray-100">
+          {(Object.keys(TAB_CONFIG) as TabKey[]).map((tab) => {
+            const cfg = TAB_CONFIG[tab];
+            const count = tabOrders[tab].length;
+            const isActive = activeTab === tab;
+            return (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={cn(
+                  'flex-1 flex items-center justify-center gap-1.5 py-3 text-sm font-semibold transition-colors',
+                  isActive ? cfg.activeColor : cfg.color,
+                )}
+              >
+                {cfg.label}
+                {count > 0 && (
+                  <span className={cn('text-xs font-bold rounded-full px-1.5 py-0.5', cfg.badgeColor)}>
+                    {count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
       </header>
 
-      {/* Kanban board */}
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+      {/* 모바일: 탭별 주문 목록 */}
+      <div className="flex-1 flex flex-col lg:hidden overflow-y-auto p-3 space-y-3">
+        {tabOrders[activeTab].length === 0 ? (
+          <div className="flex items-center justify-center flex-1 text-gray-400 text-sm min-h-[200px]">
+            {activeTab === 'pending' && '송금 대기 없음'}
+            {activeTab === 'active' && '준비 중인 주문 없음'}
+            {activeTab === 'ready' && '픽업 대기 없음'}
+          </div>
+        ) : (
+          tabOrders[activeTab].map((order) => (
+            <OrderCard key={order.id} order={order} onCancel={setCancelTargetId} />
+          ))
+        )}
+      </div>
+
+      {/* 데스크탑: 칸반 3열 */}
+      <div className="hidden lg:flex flex-1 overflow-hidden">
         <KanbanColumn
           title="송금 대기"
-          icon={<span className="text-base">💳</span>}
+          icon={<CreditCard className="w-4 h-4" />}
           count={pending.length}
           headerColor="bg-blue-50 text-blue-800"
           orders={pending}
@@ -293,7 +352,7 @@ export default function AdminPage() {
         />
         <KanbanColumn
           title="준비 중"
-          icon={<span className="text-base">☕</span>}
+          icon={<Coffee className="w-4 h-4" />}
           count={active.length}
           headerColor="bg-amber-50 text-amber-800"
           orders={active}
@@ -302,7 +361,7 @@ export default function AdminPage() {
         />
         <KanbanColumn
           title="픽업 대기"
-          icon={<span className="text-base">🔔</span>}
+          icon={<Bell className="w-4 h-4" />}
           count={ready.length}
           headerColor="bg-green-50 text-green-800"
           orders={ready}
@@ -311,7 +370,7 @@ export default function AdminPage() {
         />
       </div>
 
-      {/* Completed + cancelled footer */}
+      {/* 완료·취소 (모바일/데스크탑 공통 하단) */}
       {done.length > 0 && (
         <div className="shrink-0 bg-white border-t border-gray-100">
           <button
@@ -319,7 +378,7 @@ export default function AdminPage() {
             className="w-full flex items-center justify-between px-4 lg:px-6 py-3 text-sm text-gray-500 hover:bg-gray-50 transition-colors"
           >
             <span className="font-medium">완료·취소 {done.length}건</span>
-            {showDone ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+            {showDone ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
           {showDone && (
             <div className="px-3 pb-3 grid grid-cols-1 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto opacity-70">
@@ -350,14 +409,14 @@ export default function AdminPage() {
               <button
                 onClick={() => setCancelTargetId(null)}
                 disabled={isCancelling}
-                className="flex-1 py-3 rounded-xl border-2 border-gray-200 text-gray-500 font-bold text-sm hover:bg-gray-50 disabled:opacity-50"
+                className="flex-1 py-4 rounded-xl border-2 border-gray-200 text-gray-500 font-bold text-sm hover:bg-gray-50 disabled:opacity-50"
               >
                 돌아가기
               </button>
               <button
                 onClick={handleCancelConfirm}
                 disabled={isCancelling}
-                className="flex-1 py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 py-4 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {isCancelling ? (
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
