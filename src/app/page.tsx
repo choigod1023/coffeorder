@@ -137,10 +137,7 @@ export default function HomePage() {
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Coffee className="w-6 h-6 text-amber-700" />
-            <div>
-              <h1 className="text-base font-bold text-amber-900 leading-tight">상록수커피클럽</h1>
-              <p className="text-xs text-amber-600">SCC 음료 주문</p>
-            </div>
+            <h1 className="text-base font-bold text-amber-900 leading-tight">상록수커피클럽</h1>
           </div>
           <div className="flex items-center gap-1">
             <button
@@ -182,7 +179,7 @@ export default function HomePage() {
         )}
 
         {/* Menu */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-4">
           {MENU.map((item) => (
             <MenuItemCard
               key={item.id}
@@ -202,7 +199,7 @@ export default function HomePage() {
           <div className="max-w-2xl mx-auto px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
             <button
               onClick={() => setIsCartOpen(true)}
-              className="w-full bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white rounded-2xl py-4 px-5 flex items-center justify-between transition-colors"
+              className="w-full bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white rounded-2xl py-5 px-5 flex items-center justify-between transition-colors"
             >
               <span className="flex items-center gap-3">
                 <span className="bg-amber-500 text-white rounded-full w-7 h-7 flex items-center justify-center text-sm font-bold">
@@ -271,7 +268,7 @@ export default function HomePage() {
                 </div>
                 <button
                   onClick={handleOrderClick}
-                  className="w-full bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white rounded-2xl py-4 font-bold text-base transition-colors"
+                  className="w-full bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white rounded-2xl py-5 font-bold text-base transition-colors"
                 >
                   주문하기 ({totalItems}잔)
                 </button>
@@ -304,7 +301,7 @@ export default function HomePage() {
               placeholder="이름 입력 (최대 5자)"
               maxLength={5}
               autoFocus
-              className="w-full border-2 border-amber-200 focus:border-amber-500 rounded-xl px-4 py-3 text-base text-gray-800 placeholder-gray-400 outline-none transition-colors text-center font-semibold"
+              className="w-full border-2 border-amber-200 focus:border-amber-500 rounded-xl px-4 py-4 text-base text-gray-800 placeholder-gray-400 outline-none transition-colors text-center font-semibold"
             />
             {nameError && (
               <p className="text-red-500 text-xs text-center mt-1.5">{nameError}</p>
@@ -313,14 +310,14 @@ export default function HomePage() {
               <button
                 onClick={() => setShowNameModal(false)}
                 disabled={isOrdering}
-                className="flex-1 py-3 rounded-xl border-2 border-gray-200 text-gray-500 font-bold text-sm hover:bg-gray-50 transition-colors disabled:opacity-50"
+                className="flex-1 py-4 rounded-xl border-2 border-gray-200 text-gray-500 font-bold text-sm hover:bg-gray-50 transition-colors disabled:opacity-50"
               >
                 취소
               </button>
               <button
                 onClick={handleConfirmOrder}
                 disabled={isOrdering || !customerName.trim()}
-                className="flex-1 py-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm transition-colors disabled:bg-amber-300 flex items-center justify-center gap-2"
+                className="flex-1 py-4 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm transition-colors disabled:bg-amber-300 flex items-center justify-center gap-2"
               >
                 {isOrdering ? (
                   <>
