@@ -25,15 +25,32 @@ const STATUS_LABEL: Record<OrderStatus, string> = {
   cancelled: '취소됨',
 };
 
+const MENU_COLUMNS = [
+  { key: 'hangsang-hot',  label: '항상(핫)' },
+  { key: 'hangsang-ice',  label: '항상(아이스)' },
+  { key: 'pureun-hot',   label: '푸른(핫)' },
+  { key: 'pureun-ice',   label: '푸른(아이스)' },
+  { key: 'namu-ice',     label: '나무(아이스)' },
+];
+
 function exportToCSV(orders: FirebaseOrder[]) {
-  const headers = ['주문번호', '고객이름', '주문시간', '메뉴', '합계금액', '결제방식', '상태'];
+  const headers = [
+    '주문번호', '고객이름', '주문시간',
+    ...MENU_COLUMNS.map((c) => c.label),
+    '합계금액', '결제방식', '상태',
+  ];
+
   const rows = orders.map((o) => {
-    const menuStr = o.items.map((i) => `${i.name}×${i.quantity}`).join(' / ');
+    const qtys = MENU_COLUMNS.map(({ key }) => {
+      const item = o.items.find((i) => `${i.menuItemId}-${i.option}` === key);
+      return item?.quantity ?? 0;
+    });
+
     return [
       o.id,
       o.customerName || '-',
       new Date(o.createdAt).toLocaleString('ko-KR'),
-      menuStr,
+      ...qtys,
       o.totalPrice,
       o.paymentMethod === 'cash' ? '현금' : '토스',
       STATUS_LABEL[o.status],
