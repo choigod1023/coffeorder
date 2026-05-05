@@ -18,6 +18,7 @@ export interface FirebaseOrder {
   items: OrderItem[];
   totalPrice: number;
   status: OrderStatus;
+  paymentMethod?: 'toss' | 'cash';
   createdAt: string;
 }
 
@@ -51,6 +52,10 @@ export async function createOrder(
 
 export async function updateOrderStatus(id: string, status: OrderStatus): Promise<void> {
   await updateDoc(doc(db, 'orders', id), { status });
+}
+
+export async function confirmCashPayment(id: string): Promise<void> {
+  await updateDoc(doc(db, 'orders', id), { status: 'paid', paymentMethod: 'cash' });
 }
 
 export async function cancelOrder(id: string): Promise<void> {

@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { subscribeToAllOrders, updateOrderStatus, cancelOrder, FirebaseOrder } from '@/lib/orders';
+import { subscribeToAllOrders, updateOrderStatus, cancelOrder, confirmCashPayment, FirebaseOrder } from '@/lib/orders';
 import { OrderStatus } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -26,7 +26,7 @@ const STATUS_LABEL: Record<OrderStatus, string> = {
 };
 
 function exportToCSV(orders: FirebaseOrder[]) {
-  const headers = ['주문번호', '고객이름', '주문시간', '메뉴', '합계금액', '상태'];
+  const headers = ['주문번호', '고객이름', '주문시간', '메뉴', '합계금액', '결제방식', '상태'];
   const rows = orders.map((o) => {
     const menuStr = o.items.map((i) => `${i.name}×${i.quantity}`).join(' / ');
     return [
@@ -35,6 +35,7 @@ function exportToCSV(orders: FirebaseOrder[]) {
       new Date(o.createdAt).toLocaleString('ko-KR'),
       menuStr,
       o.totalPrice,
+      o.paymentMethod === 'cash' ? '현금' : '토스',
       STATUS_LABEL[o.status],
     ].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',');
   });
@@ -52,7 +53,6 @@ function exportToCSV(orders: FirebaseOrder[]) {
 
 function OrderCard({ order, onCancel }: { order: FirebaseOrder; onCancel: (id: string) => void }) {
   const [loading, setLoading] = useState(false);
-  const shortId = order.id;
 
   const advance = async (next: OrderStatus) => {
     setLoading(true);
@@ -60,8 +60,15 @@ function OrderCard({ order, onCancel }: { order: FirebaseOrder; onCancel: (id: s
     finally { setLoading(false); }
   };
 
+  const handleCash = async () => {
+    setLoading(true);
+    try { await confirmCashPayment(order.id); }
+    finally { setLoading(false); }
+  };
+
   const isCancelled = order.status === 'cancelled';
   const canCancel = order.status === 'pending' || order.status === 'paid';
+  const isCash = order.paymentMethod === 'cash';
 
   return (
     <div className={cn(
@@ -70,9 +77,12 @@ function OrderCard({ order, onCancel }: { order: FirebaseOrder; onCancel: (id: s
     )}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="font-mono text-base font-bold text-gray-800">#{shortId}</span>
+          <span className="font-mono text-base font-bold text-gray-800">#{order.id}</span>
           {order.customerName && (
             <span className="text-base font-bold text-sage-700">{order.customerName}</span>
+          )}
+          {isCash && (
+            <span className="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">현금</span>
           )}
         </div>
         <span className="text-xs text-gray-400 flex items-center gap-1">
@@ -101,14 +111,24 @@ function OrderCard({ order, onCancel }: { order: FirebaseOrder; onCancel: (id: s
       {!isCancelled && (
         <div className="flex flex-col gap-2">
           {order.status === 'pending' && (
-            <button
-              onClick={() => advance('paid')}
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl py-4 text-sm font-bold transition-colors"
-            >
-              <CheckCircle2 className="w-5 h-5" />
-              송금 확인 완료
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => advance('paid')}
+                disabled={loading}
+                className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl py-4 text-sm font-bold transition-colors"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                송금 확인
+              </button>
+              <button
+                onClick={handleCash}
+                disabled={loading}
+                className="flex-1 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white rounded-xl py-4 text-sm font-bold transition-colors"
+              >
+                <CreditCard className="w-4 h-4" />
+                현금 결제
+              </button>
+            </div>
           )}
           {order.status === 'paid' && (
             <button
