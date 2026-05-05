@@ -12,7 +12,7 @@ export default function MenuItem({ item, cartQty, onPress }: MenuItemProps) {
   return (
     <button
       onClick={onPress}
-      className="w-full text-left rounded-2xl overflow-hidden border border-sage-200 bg-white shadow-sm active:scale-[0.97] transition-transform"
+      className="w-full text-left rounded-2xl overflow-hidden bg-white shadow-sm active:scale-[0.97] transition-transform"
     >
       <div className="relative w-full aspect-square bg-gradient-to-br from-sage-600 to-sage-400 flex items-center justify-center">
         <span className="text-7xl">{item.category === '논커피' ? '🌿' : '☕'}</span>
