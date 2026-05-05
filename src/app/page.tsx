@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import { CartItem, MenuItem, MenuOption } from '@/types';
 import MenuItemCard from '@/components/MenuItem';
 import CartItemCard from '@/components/CartItem';
-import { ShoppingCart, X, Info, Plus, Minus, Check } from 'lucide-react';
-import { createOrder, getOrderStatus } from '@/lib/orders';
+import { ShoppingCart, X, Info, Plus, Minus, Check, Clock } from 'lucide-react';
+import { createOrder, getOrderStatus, subscribeToWaitQueueCount } from '@/lib/orders';
 import { MENU } from '@/lib/menu';
 import { getCart, saveCart } from '@/lib/cart';
 import { getActiveOrder, saveActiveOrder, clearActiveOrder, ActiveOrderInfo } from '@/lib/activeOrder';
@@ -26,12 +26,18 @@ export default function HomePage() {
   const [nameError, setNameError] = useState('');
 
   const [activeOrder, setActiveOrder] = useState<ActiveOrderInfo | null>(null);
+  const [waitQueueCount, setWaitQueueCount] = useState(0);
 
   // 메뉴 상세 모달 상태
   const [selectedMenu, setSelectedMenu] = useState<MenuItem | null>(null);
   const [modalOption, setModalOption] = useState<MenuOption>('ice');
   const [addQty, setAddQty] = useState(1);
   const [justAdded, setJustAdded] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToWaitQueueCount(setWaitQueueCount);
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     setCart(getCart());
@@ -141,7 +147,6 @@ export default function HomePage() {
     setNameError('');
     setIsOrdering(true);
     try {
-      const orderId = `order-${Date.now()}`;
       const items = cart.map((item) => ({
         menuItemId: item.menuId,
         name: item.name,
@@ -149,7 +154,7 @@ export default function HomePage() {
         quantity: item.quantity,
         option: item.option,
       }));
-      await createOrder(orderId, trimmed, items, totalPrice);
+      const orderId = await createOrder(trimmed, items, totalPrice);
       saveActiveOrder({ orderId, total: totalPrice, name: trimmed });
       setShowNameModal(false);
       updateCart([]);
@@ -419,6 +424,13 @@ export default function HomePage() {
             </div>
             {cart.length > 0 && (
               <div className="px-5 py-4 border-t border-sage-100 bg-sage-50/50">
+                <div className="flex items-center gap-2 bg-white border border-sage-200 rounded-xl px-3 py-2.5 mb-3">
+                  <Clock className="w-4 h-4 text-sage-600 shrink-0" />
+                  <span className="text-xs text-sage-700 font-medium">예상 대기</span>
+                  <span className="text-xs font-bold text-sage-900 ml-auto">
+                    {waitQueueCount === 0 ? '약 3~5분' : waitQueueCount <= 2 ? '약 6~10분' : waitQueueCount <= 4 ? '약 11~15분' : '약 15~20분'}
+                  </span>
+                </div>
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-gray-600 font-medium">총 금액</span>
                   <span className="text-xl font-bold text-sage-800">

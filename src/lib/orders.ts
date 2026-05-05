@@ -5,6 +5,7 @@ import {
   updateDoc,
   onSnapshot,
   getDoc,
+  runTransaction,
   collection,
   query,
   orderBy,
@@ -20,12 +21,23 @@ export interface FirebaseOrder {
   createdAt: string;
 }
 
+async function generateOrderId(): Promise<string> {
+  const counterRef = doc(db, 'meta', 'orderCounter');
+  const num = await runTransaction(db, async (tx) => {
+    const snap = await tx.get(counterRef);
+    const next = (snap.exists() ? (snap.data().count as number) : 0) + 1;
+    tx.set(counterRef, { count: next });
+    return next;
+  });
+  return `F${String(num).padStart(3, '0')}`;
+}
+
 export async function createOrder(
-  id: string,
   customerName: string,
   items: OrderItem[],
   totalPrice: number,
-): Promise<void> {
+): Promise<string> {
+  const id = await generateOrderId();
   await setDoc(doc(db, 'orders', id), {
     id,
     customerName,
@@ -34,6 +46,7 @@ export async function createOrder(
     status: 'pending',
     createdAt: new Date().toISOString(),
   });
+  return id;
 }
 
 export async function updateOrderStatus(id: string, status: OrderStatus): Promise<void> {

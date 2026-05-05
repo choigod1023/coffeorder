@@ -26,12 +26,14 @@ export default function InfoPage() {
       </header>
 
       <main className="max-w-md mx-auto px-4 py-6 flex flex-col gap-4">
+        {/* Hero */}
         <div className="bg-gradient-to-r from-sage-600 to-sage-400 rounded-2xl p-6 text-white text-center">
           <Image src="/logo.png" alt="상록수커피클럽" width={80} height={80} className="rounded-full mx-auto mb-3 border-2 border-white/30" />
           <h2 className="text-xl font-bold">상록수커피클럽</h2>
-          <p className="text-white/70 text-sm mt-1">SCC · 동국대학교</p>
+          <p className="text-white/70 text-sm mt-1">SCC · 동국대학교 봄 축제</p>
         </div>
 
+        {/* 부스 위치 */}
         <div className="bg-white rounded-2xl border border-sage-100 shadow-sm p-5">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-9 h-9 bg-sage-100 rounded-xl flex items-center justify-center">
@@ -39,15 +41,20 @@ export default function InfoPage() {
             </div>
             <h3 className="font-bold text-gray-800">부스 위치</h3>
           </div>
-          <div className="bg-sage-50 rounded-xl p-4">
-            <p className="text-sm text-sage-900 font-semibold">축제 현장 내 SCC 부스</p>
-            <p className="text-xs text-sage-700 mt-1">(상세 위치 업데이트 예정)</p>
+          {/* 팔정도 지도 이미지 — 홍보부에서 받으면 /public/map.png로 추가 */}
+          <div className="w-full aspect-square bg-sage-100 rounded-xl flex items-center justify-center mb-3 max-w-[300px] mx-auto">
+            <div className="text-center text-sage-400">
+              <MapPin className="w-10 h-10 mx-auto mb-2 opacity-40" />
+              <p className="text-xs font-medium">지도 이미지 준비 중</p>
+            </div>
           </div>
-          <p className="text-xs text-gray-500 mt-3">
-            궁금한 점은 부스 스태프에게 문의해주세요
-          </p>
+          <div className="bg-sage-50 rounded-xl px-4 py-3 text-center">
+            <p className="text-sm font-bold text-sage-900">팔정도 00번 부스</p>
+            <p className="text-xs text-sage-700 mt-0.5">코끼리 동상 맞은편</p>
+          </div>
         </div>
 
+        {/* 인스타그램 */}
         <a
           href="https://www.instagram.com/scc_dgu/"
           target="_blank"
@@ -64,6 +71,7 @@ export default function InfoPage() {
           <ExternalLink className="w-4 h-4 text-gray-300 ml-auto" />
         </a>
 
+        {/* 노션 */}
         <a
           href="https://band-fright-fec.notion.site/66f9a52e180d4784a9ecd48fcd98942e"
           target="_blank"
@@ -79,6 +87,41 @@ export default function InfoPage() {
           </div>
           <ExternalLink className="w-4 h-4 text-gray-300 ml-auto" />
         </a>
+
+        {/* 빈브라더스 */}
+        <div className="bg-white rounded-2xl border border-sage-100 shadow-sm p-5">
+          <p className="text-xs text-gray-400 font-medium mb-3">원두 파트너</p>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-11 h-11 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-center shrink-0">
+              <Coffee className="w-5 h-5 text-amber-700" />
+            </div>
+            <div>
+              <p className="font-bold text-gray-800 text-sm">빈브라더스</p>
+              <p className="text-xs text-gray-500 mt-0.5">Bean Brothers Coffee</p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <a
+              href="https://www.instagram.com/beanbrothers_official/"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => window.gtag?.('event', 'click', { event_category: 'outbound', event_label: 'beanbrothers_instagram' })}
+              className="flex-1 flex items-center justify-center gap-1.5 border border-gray-200 rounded-xl py-2.5 text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              인스타그램
+            </a>
+            <a
+              href="https://www.beanbrothers.co.kr/info/brand"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 flex items-center justify-center gap-1.5 border border-gray-200 rounded-xl py-2.5 text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              홈페이지
+            </a>
+          </div>
+        </div>
 
         <div className="text-center py-2">
           <p className="text-xs text-gray-400">SCC와 함께하는 특별한 커피 경험</p>

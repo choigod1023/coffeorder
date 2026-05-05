@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { GoogleAnalytics } from '@next/third-parties/google';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "커피 주문",
-  description: "신선한 커피를 편리하게 주문하세요",
+  title: "상록수커피클럽 | SCC 봄 축제 음료 주문",
+  description: "상록수커피클럽 봄 축제 음료 주문 시스템 — 원하는 음료를 고르고 토스로 결제하세요",
 };
 
 export default function RootLayout({
@@ -28,6 +29,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-amber-50">{children}</body>
+      {process.env.NEXT_PUBLIC_GA_ID && (
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+      )}
     </html>
   );
 }

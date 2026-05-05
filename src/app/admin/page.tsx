@@ -52,7 +52,7 @@ function exportToCSV(orders: FirebaseOrder[]) {
 
 function OrderCard({ order, onCancel }: { order: FirebaseOrder; onCancel: (id: string) => void }) {
   const [loading, setLoading] = useState(false);
-  const shortId = order.id.replace('order-', '').slice(-6);
+  const shortId = order.id;
 
   const advance = async (next: OrderStatus) => {
     setLoading(true);
