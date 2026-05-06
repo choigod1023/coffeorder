@@ -35,6 +35,9 @@ export default function HomePage() {
   const [addQty, setAddQty] = useState(1);
   const [justAdded, setJustAdded] = useState(false);
 
+  // 페이지 스크롤 컨테이너 (body 대신 이 div가 스크롤)
+  const pageRef = useRef<HTMLDivElement>(null);
+
   // 드래그로 닫기를 위한 refs (DOM 직접 조작으로 60fps 애니메이션)
   const cartSheetRef = useRef<HTMLDivElement>(null);
   const menuSheetRef = useRef<HTMLDivElement>(null);
@@ -46,21 +49,16 @@ export default function HomePage() {
     return unsubscribe;
   }, []);
 
-  // 바텀시트 열릴 때 배경 스크롤 잠금 (iOS Safari는 overflow:hidden만으로 부족 → position:fixed 필요)
+  // 바텀시트 열릴 때 페이지 div 스크롤 잠금 (body는 항상 overflow:hidden이므로 position:fixed 불필요)
   useEffect(() => {
     const locked = isCartOpen || !!selectedMenu || showNameModal;
-    if (!locked) return;
-    const scrollY = window.scrollY;
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = '100%';
+    const el = pageRef.current;
+    if (!el || !locked) return;
+    const scrollTop = el.scrollTop;
+    el.style.overflowY = 'hidden';
     return () => {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      window.scrollTo(0, scrollY);
+      el.style.overflowY = '';
+      el.scrollTop = scrollTop;
     };
   }, [isCartOpen, selectedMenu, showNameModal]);
 
@@ -271,7 +269,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-sage-50">
+    <div ref={pageRef} className="h-full overflow-y-auto overscroll-none bg-sage-50">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white border-b border-sage-100 shadow-sm">
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
