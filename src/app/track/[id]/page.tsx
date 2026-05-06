@@ -24,7 +24,7 @@ const STATUS_MESSAGES: Record<OrderStatus, string> = {
 };
 
 const STATUS_BG: Record<OrderStatus, string> = {
-  pending: 'bg-gray-100',
+  pending: 'bg-sage-50',
   paid: 'bg-blue-50',
   preparing: 'bg-sage-50',
   ready: 'bg-green-50',

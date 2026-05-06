@@ -41,9 +41,9 @@ export default function OrderStatusTracker({ status }: OrderStatusProps) {
   return (
     <div className="w-full">
       <div className="relative mb-6">
-        <div className="absolute top-4 left-0 right-0 h-1 bg-amber-100 rounded-full mx-8">
+        <div className="absolute top-4 left-0 right-0 h-1 bg-gray-100 rounded-full mx-8">
           <div
-            className="h-full bg-amber-500 rounded-full transition-all duration-700 ease-in-out"
+            className="h-full bg-sage-500 rounded-full transition-all duration-700 ease-in-out"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -59,8 +59,8 @@ export default function OrderStatusTracker({ status }: OrderStatusProps) {
                 <div
                   className={cn(
                     'w-8 h-8 rounded-full flex items-center justify-center transition-all duration-500 z-10',
-                    isCompleted && 'bg-amber-500 text-white shadow-md',
-                    isCurrent && 'bg-amber-600 text-white shadow-lg ring-2 ring-amber-300 scale-110',
+                    isCompleted && 'bg-sage-500 text-white shadow-md',
+                    isCurrent && 'bg-sage-600 text-white shadow-lg ring-2 ring-sage-300 scale-110',
                     isPending && 'bg-gray-100 text-gray-400 border border-gray-200',
                   )}
                 >
@@ -73,8 +73,8 @@ export default function OrderStatusTracker({ status }: OrderStatusProps) {
                 <span
                   className={cn(
                     'text-xs font-medium text-center leading-tight',
-                    isCompleted && 'text-amber-600',
-                    isCurrent && 'text-amber-700 font-bold',
+                    isCompleted && 'text-sage-600',
+                    isCurrent && 'text-sage-700 font-bold',
                     isPending && 'text-gray-400',
                   )}
                 >

@@ -236,8 +236,8 @@ const TAB_CONFIG: Record<TabKey, { label: string; color: string; activeColor: st
   pending: {
     label: '송금대기',
     color: 'text-gray-500',
-    activeColor: 'text-blue-600 border-b-2 border-blue-600',
-    badgeColor: 'bg-blue-100 text-blue-700',
+    activeColor: 'text-gray-700 border-b-2 border-gray-700',
+    badgeColor: 'bg-gray-200 text-gray-700',
   },
   active: {
     label: '준비중',
@@ -382,7 +382,7 @@ export default function AdminPage() {
           title="송금 대기"
           icon={<CreditCard className="w-4 h-4" />}
           count={pending.length}
-          headerColor="bg-blue-50 text-blue-800"
+          headerColor="bg-gray-100 text-gray-800"
           orders={pending}
           emptyText="송금 대기 없음"
           onCancel={setCancelTargetId}
