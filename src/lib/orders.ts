@@ -94,7 +94,7 @@ export function subscribeToWaitQueueCount(
     const cups = snap.docs
       .filter((d) => {
         const s = d.data().status as OrderStatus;
-        return s === 'paid' || s === 'preparing';
+        return s === 'pending' || s === 'paid' || s === 'preparing';
       })
       .reduce((total, d) => {
         const items = d.data().items as OrderItem[];
