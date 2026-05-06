@@ -6,7 +6,7 @@ import { CartItem, MenuItem, MenuOption } from '@/types';
 import MenuItemCard from '@/components/MenuItem';
 import CartItemCard from '@/components/CartItem';
 import { ShoppingCart, X, Info, Plus, Minus, Check, Clock } from 'lucide-react';
-import { createOrder, getOrderStatus, subscribeToWaitQueueCount } from '@/lib/orders';
+import { createOrder, getOrderStatus, subscribeToWaitQueueCount, calcWaitTimeText } from '@/lib/orders';
 import { MENU } from '@/lib/menu';
 import { getCart, saveCart } from '@/lib/cart';
 import { getActiveOrder, saveActiveOrder, clearActiveOrder, ActiveOrderInfo } from '@/lib/activeOrder';
@@ -428,7 +428,7 @@ export default function HomePage() {
                   <Clock className="w-4 h-4 text-sage-600 shrink-0" />
                   <span className="text-xs text-sage-700 font-medium">예상 대기</span>
                   <span className="text-xs font-bold text-sage-900 ml-auto">
-                    {waitQueueCount === 0 ? '약 3~5분' : waitQueueCount <= 2 ? '약 6~10분' : waitQueueCount <= 4 ? '약 11~15분' : '약 15~20분'}
+                    {calcWaitTimeText(waitQueueCount, totalItems)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center mb-4">

@@ -87,14 +87,27 @@ export function subscribeToAllOrders(
 }
 
 export function subscribeToWaitQueueCount(
-  callback: (count: number) => void,
+  callback: (cups: number) => void,
 ): () => void {
   const q = query(collection(db, 'orders'), orderBy('createdAt', 'asc'));
   return onSnapshot(q, (snap) => {
-    const count = snap.docs.filter((d) => {
-      const s = d.data().status as OrderStatus;
-      return s === 'paid' || s === 'preparing';
-    }).length;
-    callback(count);
+    const cups = snap.docs
+      .filter((d) => {
+        const s = d.data().status as OrderStatus;
+        return s === 'paid' || s === 'preparing';
+      })
+      .reduce((total, d) => {
+        const items = d.data().items as OrderItem[];
+        return total + items.reduce((s, i) => s + (i.quantity ?? 0), 0);
+      }, 0);
+    callback(cups);
   });
+}
+
+export function calcWaitTimeText(queueCups: number, myCartCups = 0): string {
+  const total = queueCups + myCartCups;
+  if (total <= 4)  return '약 3~5분';
+  if (total <= 8)  return '약 6~10분';
+  if (total <= 12) return '약 11~15분';
+  return '약 15~20분';
 }

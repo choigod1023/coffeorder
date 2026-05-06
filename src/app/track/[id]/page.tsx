@@ -6,7 +6,7 @@ import { Coffee, Bell, X, CheckCircle2, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { OrderStatus } from '@/types';
 import OrderStatusTracker from '@/components/OrderStatus';
-import { subscribeToOrder, cancelOrder, subscribeToWaitQueueCount, FirebaseOrder } from '@/lib/orders';
+import { subscribeToOrder, cancelOrder, subscribeToWaitQueueCount, calcWaitTimeText, FirebaseOrder } from '@/lib/orders';
 import { clearActiveOrder } from '@/lib/activeOrder';
 import { cn } from '@/lib/utils';
 
@@ -32,12 +32,6 @@ const STATUS_BG: Record<OrderStatus, string> = {
   cancelled: 'bg-red-50',
 };
 
-function getWaitTimeText(count: number): string {
-  if (count === 0) return '약 3~5분';
-  if (count <= 2) return '약 6~10분';
-  if (count <= 4) return '약 11~15분';
-  return '약 15~20분';
-}
 
 function StatusIcon({ status }: { status: OrderStatus }) {
   if (status === 'cancelled') return <X className="w-6 h-6 text-red-500" />;
@@ -125,7 +119,7 @@ export default function TrackPage({ params }: Props) {
             <Clock className="w-5 h-5 text-sage-600 flex-shrink-0" />
             <div>
               <p className="text-xs text-sage-700 font-medium">예상 대기 시간</p>
-              <p className="text-base font-bold text-sage-900">{getWaitTimeText(waitQueueCount)}</p>
+              <p className="text-base font-bold text-sage-900">{calcWaitTimeText(waitQueueCount)}</p>
             </div>
           </div>
         )}
