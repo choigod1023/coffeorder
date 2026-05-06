@@ -35,9 +35,6 @@ export default function HomePage() {
   const [addQty, setAddQty] = useState(1);
   const [justAdded, setJustAdded] = useState(false);
 
-  // 페이지 스크롤 컨테이너 (body 대신 이 div가 스크롤)
-  const pageRef = useRef<HTMLDivElement>(null);
-
   // 드래그로 닫기를 위한 refs (DOM 직접 조작으로 60fps 애니메이션)
   const cartSheetRef = useRef<HTMLDivElement>(null);
   const menuSheetRef = useRef<HTMLDivElement>(null);
@@ -48,19 +45,6 @@ export default function HomePage() {
     const unsubscribe = subscribeToWaitQueueCount(setWaitQueueCount);
     return unsubscribe;
   }, []);
-
-  // 바텀시트 열릴 때 페이지 div 스크롤 잠금 (body는 항상 overflow:hidden이므로 position:fixed 불필요)
-  useEffect(() => {
-    const locked = isCartOpen || !!selectedMenu || showNameModal;
-    const el = pageRef.current;
-    if (!el || !locked) return;
-    const scrollTop = el.scrollTop;
-    el.style.overflowY = 'hidden';
-    return () => {
-      el.style.overflowY = '';
-      el.scrollTop = scrollTop;
-    };
-  }, [isCartOpen, selectedMenu, showNameModal]);
 
   useEffect(() => {
     setCart(getCart());
@@ -269,7 +253,7 @@ export default function HomePage() {
   };
 
   return (
-    <div ref={pageRef} className="h-full overflow-y-auto overscroll-none bg-sage-50">
+    <div className="min-h-screen bg-sage-50">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white border-b border-sage-100 shadow-sm">
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
@@ -424,7 +408,7 @@ export default function HomePage() {
             </div>
 
             {/* 스크롤 영역 */}
-            <div className="overflow-y-auto overscroll-y-contain flex-1">
+            <div className="overflow-y-auto flex-1">
               <div className="h-48 bg-gradient-to-br from-sage-600 to-sage-400 flex items-center justify-center">
                 <span className="text-8xl">{selectedMenu.category === '논커피' ? '🌿' : '☕'}</span>
               </div>
@@ -544,7 +528,7 @@ export default function HomePage() {
                 <X className="w-4 h-4 text-gray-500" />
               </button>
             </div>
-            <div className="overflow-y-auto overscroll-y-contain flex-1 px-5 py-3">
+            <div className="overflow-y-auto flex-1 px-5 py-3">
               {cart.length === 0 ? (
                 <div className="text-center py-8 text-gray-400">
                   <ShoppingCart className="w-10 h-10 mx-auto mb-2 opacity-30" />
