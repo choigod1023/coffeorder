@@ -301,7 +301,7 @@ export default function HomePage() {
       </header>
 
       {/* Main */}
-      <main className="max-w-2xl mx-auto px-4 pb-32">
+      <main className="max-w-2xl mx-auto px-4 pb-24">
         {/* 진행 중인 주문 배너 */}
         {activeOrders.length === 1 && (
           <Link
@@ -358,12 +358,12 @@ export default function HomePage() {
         )}
 
         {/* Hero */}
-        <div className="mt-4 mb-5 rounded-2xl bg-gradient-to-r from-sage-600 to-sage-400 p-6 text-white flex items-center gap-5">
-          <Image src="/logo.png" alt="상록수커피클럽" width={80} height={80} className="rounded-full shrink-0 border-2 border-white/30" />
+        <div className="mt-3 mb-3 rounded-2xl bg-gradient-to-r from-sage-600 to-sage-400 p-4 text-white flex items-center gap-4">
+          <Image src="/logo.png" alt="상록수커피클럽" width={56} height={56} className="rounded-full shrink-0 border-2 border-white/30" />
           <div>
-            <p className="text-white/70 text-sm font-medium mb-1">상록수커피클럽</p>
-            <h2 className="text-xl font-bold leading-snug">음료를 고르고<br />결제하면 끝!</h2>
-            <p className="text-white/70 text-xs mt-1.5">준비되는 동안 실시간으로 알려드려요</p>
+            <p className="text-white/70 text-xs font-medium mb-0.5">상록수커피클럽</p>
+            <h2 className="text-lg font-bold leading-snug">음료를 고르고 결제하면 끝!</h2>
+            <p className="text-white/70 text-xs mt-1">준비되는 동안 실시간으로 알려드려요</p>
           </div>
         </div>
 
