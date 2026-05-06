@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { CartItem, MenuItem, MenuOption } from '@/types';
 import MenuItemCard from '@/components/MenuItem';
@@ -35,10 +35,23 @@ export default function HomePage() {
   const [addQty, setAddQty] = useState(1);
   const [justAdded, setJustAdded] = useState(false);
 
+  // 드래그로 닫기를 위한 refs (DOM 직접 조작으로 60fps 애니메이션)
+  const cartSheetRef = useRef<HTMLDivElement>(null);
+  const menuSheetRef = useRef<HTMLDivElement>(null);
+  const dragStartY = useRef(0);
+  const dragCurrentY = useRef(0);
+
   useEffect(() => {
     const unsubscribe = subscribeToWaitQueueCount(setWaitQueueCount);
     return unsubscribe;
   }, []);
+
+  // 바텀시트 열릴 때 배경 스크롤 잠금
+  useEffect(() => {
+    const locked = isCartOpen || !!selectedMenu || showNameModal;
+    document.body.style.overflow = locked ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [isCartOpen, selectedMenu, showNameModal]);
 
   useEffect(() => {
     setCart(getCart());
@@ -116,6 +129,43 @@ export default function HomePage() {
       setIsCartOpen(false);
     }
   }, []);
+
+  // 드래그로 닫기 핸들러 생성 (ref 직접 조작 → React 리렌더 없이 부드러운 애니메이션)
+  function makeDragHandlers(
+    sheetRef: { current: HTMLDivElement | null },
+    onClose: () => void,
+  ) {
+    return {
+      onTouchStart(e: React.TouchEvent) {
+        dragStartY.current = e.touches[0].clientY;
+        dragCurrentY.current = 0;
+        if (sheetRef.current) sheetRef.current.style.transition = 'none';
+      },
+      onTouchMove(e: React.TouchEvent) {
+        const delta = e.touches[0].clientY - dragStartY.current;
+        if (delta < 0) return;
+        dragCurrentY.current = delta;
+        if (sheetRef.current) sheetRef.current.style.transform = `translateY(${delta}px)`;
+      },
+      onTouchEnd() {
+        if (!sheetRef.current) return;
+        sheetRef.current.style.transition = 'transform 0.3s cubic-bezier(0.32, 0.72, 0, 1)';
+        if (dragCurrentY.current > 120) {
+          sheetRef.current.style.transform = 'translateY(100%)';
+          setTimeout(onClose, 280);
+        } else {
+          sheetRef.current.style.transform = 'translateY(0)';
+        }
+        dragCurrentY.current = 0;
+      },
+    };
+  }
+
+  const cartDrag = makeDragHandlers(cartSheetRef, closeCart);
+  const menuDrag = makeDragHandlers(menuSheetRef, () => {
+    if (window.history.state?.modal === 'menu') window.history.back();
+    else setSelectedMenu(null);
+  });
 
   // 메뉴 바텀시트 열릴 때 히스토리 엔트리 push → 뒤로가기 제스처로 닫기 가능
   useEffect(() => {
@@ -354,13 +404,18 @@ export default function HomePage() {
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={closeMenuModal}
           />
-          <div className="relative bg-white rounded-t-3xl shadow-2xl max-h-[85vh] flex flex-col">
-            <div className="flex justify-center pt-3 pb-1 shrink-0">
-              <div className="w-10 h-1 bg-gray-200 rounded-full" />
+          <div ref={menuSheetRef} className="relative bg-white rounded-t-3xl shadow-2xl max-h-[85vh] flex flex-col">
+            <div
+              className="flex justify-center pt-4 pb-3 shrink-0 touch-none"
+              onTouchStart={menuDrag.onTouchStart}
+              onTouchMove={menuDrag.onTouchMove}
+              onTouchEnd={menuDrag.onTouchEnd}
+            >
+              <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
             </div>
 
             {/* 스크롤 영역 */}
-            <div className="overflow-y-auto flex-1">
+            <div className="overflow-y-auto overscroll-y-contain flex-1">
               <div className="h-48 bg-gradient-to-br from-sage-600 to-sage-400 flex items-center justify-center">
                 <span className="text-8xl">{selectedMenu.category === '논커피' ? '🌿' : '☕'}</span>
               </div>
@@ -462,9 +517,14 @@ export default function HomePage() {
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={closeCart}
           />
-          <div className="relative bg-white rounded-t-3xl shadow-2xl max-h-[80vh] flex flex-col">
-            <div className="flex justify-center pt-3 pb-1">
-              <div className="w-10 h-1 bg-gray-200 rounded-full" />
+          <div ref={cartSheetRef} className="relative bg-white rounded-t-3xl shadow-2xl max-h-[80vh] flex flex-col">
+            <div
+              className="flex justify-center pt-4 pb-3 touch-none"
+              onTouchStart={cartDrag.onTouchStart}
+              onTouchMove={cartDrag.onTouchMove}
+              onTouchEnd={cartDrag.onTouchEnd}
+            >
+              <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
             </div>
             <div className="flex items-center justify-between px-5 py-3 border-b border-sage-100">
               <h2 className="text-lg font-bold text-sage-900">장바구니</h2>
@@ -475,7 +535,7 @@ export default function HomePage() {
                 <X className="w-4 h-4 text-gray-500" />
               </button>
             </div>
-            <div className="overflow-y-auto flex-1 px-5 py-3">
+            <div className="overflow-y-auto overscroll-y-contain flex-1 px-5 py-3">
               {cart.length === 0 ? (
                 <div className="text-center py-8 text-gray-400">
                   <ShoppingCart className="w-10 h-10 mx-auto mb-2 opacity-30" />
