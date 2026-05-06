@@ -95,7 +95,7 @@ export default function TrackPage({ params }: Props) {
         </div>
       </header>
 
-      <main className="flex-1 max-w-md mx-auto w-full px-4 py-6 flex flex-col gap-4">
+      <main className="flex-1 max-w-md mx-auto w-full px-4 py-3 flex flex-col gap-3">
         {showReadyBanner && (
           <div className="bg-green-500 text-white rounded-2xl p-4 flex items-center gap-3 shadow-lg animate-in slide-in-from-top-4 duration-500">
             <Bell className="w-6 h-6 flex-shrink-0 animate-bounce" />
@@ -106,12 +106,14 @@ export default function TrackPage({ params }: Props) {
           </div>
         )}
 
-        <div className="bg-white rounded-2xl border border-sage-100 shadow-sm px-5 py-4">
+        <div className="bg-white rounded-2xl border border-sage-100 shadow-sm px-4 py-3 flex items-center justify-between">
           {order?.customerName && (
-            <p className="font-bold text-sage-800 text-lg mb-1">{order.customerName}님의 주문</p>
+            <p className="font-bold text-sage-800 text-base">{order.customerName}님의 주문</p>
           )}
-          <p className="text-xs text-gray-500">주문번호</p>
-          <p className="font-mono text-sm font-semibold text-gray-800">{id}</p>
+          <div className="text-right">
+            <p className="text-xs text-gray-400">주문번호</p>
+            <p className="font-mono text-sm font-semibold text-gray-800">{id}</p>
+          </div>
         </div>
 
         {(status === 'pending' || status === 'paid') && (
@@ -124,14 +126,12 @@ export default function TrackPage({ params }: Props) {
           </div>
         )}
 
-        <div className={cn('rounded-2xl border border-transparent shadow-sm p-5 transition-colors duration-500', STATUS_BG[status])}>
-          <div className="flex items-start gap-4 mb-5">
-            <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center flex-shrink-0">
+        <div className={cn('rounded-2xl border border-transparent shadow-sm p-4 transition-colors duration-500', STATUS_BG[status])}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center flex-shrink-0">
               <StatusIcon status={status} />
             </div>
-            <div>
-              <h2 className="font-bold text-gray-900 text-base">{STATUS_MESSAGES[status]}</h2>
-            </div>
+            <h2 className="font-bold text-gray-900 text-base">{STATUS_MESSAGES[status]}</h2>
           </div>
           <OrderStatusTracker status={status} />
         </div>
@@ -139,7 +139,7 @@ export default function TrackPage({ params }: Props) {
         {canCancel && (
           <button
             onClick={() => setShowCancelModal(true)}
-            className="w-full py-4 rounded-xl border-2 border-red-200 text-red-500 text-sm font-medium hover:bg-red-50 transition-colors"
+            className="w-full py-3 rounded-xl border-2 border-red-200 text-red-500 text-sm font-medium hover:bg-red-50 transition-colors"
           >
             주문 취소 요청
           </button>
@@ -168,14 +168,6 @@ export default function TrackPage({ params }: Props) {
           </div>
         )}
 
-        <div className="bg-sage-100/50 rounded-xl p-4">
-          <p className="text-xs text-sage-800 font-medium mb-1">안내</p>
-          <ul className="text-xs text-sage-700 space-y-1">
-            <li>• 음료가 준비되면 이 화면에 알림이 표시됩니다</li>
-            <li>• 화면을 닫지 않으면 실시간으로 확인할 수 있어요</li>
-            <li>• 수령 완료 후 자동으로 다음 화면으로 이동합니다</li>
-          </ul>
-        </div>
       </main>
 
       {showCancelModal && (

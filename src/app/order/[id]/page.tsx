@@ -96,7 +96,7 @@ export default function OrderPage({ params }: Props) {
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-center px-5 py-8 max-w-md mx-auto w-full gap-4">
+      <main className="flex-1 flex flex-col items-center justify-center px-5 py-4 max-w-md mx-auto w-full gap-3">
         {isPaid ? (
           <div className="text-center animate-in fade-in-0 zoom-in-95 duration-300">
             <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
@@ -111,21 +111,16 @@ export default function OrderPage({ params }: Props) {
         ) : (
           <>
             {/* 주문 요약 */}
-            <div className="bg-white rounded-2xl shadow-sm border border-sage-100 p-5 w-full">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-11 h-11 bg-sage-100 rounded-full flex items-center justify-center">
-                  <Coffee className="w-5 h-5 text-sage-700" />
-                </div>
+            <div className="bg-white rounded-2xl shadow-sm border border-sage-100 px-5 py-3 w-full flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Coffee className="w-4 h-4 text-sage-600" />
                 <div>
                   <p className="text-xs text-gray-400">주문번호</p>
                   <p className="font-mono text-sm font-semibold text-gray-800">#{id}</p>
                 </div>
               </div>
               {total > 0 && (
-                <div className="flex justify-between items-center pt-4 border-t border-sage-50">
-                  <span className="text-gray-600 text-sm font-medium">결제 금액</span>
-                  <span className="font-bold text-sage-800 text-2xl">{total.toLocaleString('ko-KR')}원</span>
-                </div>
+                <span className="font-bold text-sage-800 text-xl">{total.toLocaleString('ko-KR')}원</span>
               )}
             </div>
 
@@ -148,13 +143,13 @@ export default function OrderPage({ params }: Props) {
 
             {/* 토스 */}
             {payMethod === 'toss' && (
-              <div className="bg-white rounded-2xl shadow-sm border border-sage-100 p-6 w-full flex flex-col items-center gap-4">
+              <div className="bg-white rounded-2xl shadow-sm border border-sage-100 p-4 w-full flex flex-col items-center gap-3">
                 <div className="text-center">
                   <h2 className="text-base font-bold text-sage-900">토스로 송금하기</h2>
-                  <p className="text-xs text-gray-400 mt-1">QR을 스캔하면 금액이 자동으로 입력됩니다</p>
+                  <p className="text-xs text-gray-400 mt-0.5">QR을 스캔하면 금액이 자동으로 입력됩니다</p>
                 </div>
-                <div className="p-4 bg-white rounded-2xl border-2 border-sage-200 shadow-inner">
-                  <QRCodeSVG value={tossUrl} size={220} fgColor="#577050" bgColor="#ffffff" level="M" />
+                <div className="p-3 bg-white rounded-2xl border-2 border-sage-200 shadow-inner">
+                  <QRCodeSVG value={tossUrl} size={160} fgColor="#577050" bgColor="#ffffff" level="M" />
                 </div>
                 {isMobile && (
                   <button
@@ -171,10 +166,10 @@ export default function OrderPage({ params }: Props) {
 
             {/* 타행앱 */}
             {payMethod === 'other' && (
-              <div className="bg-white rounded-2xl shadow-sm border border-sage-100 p-6 w-full flex flex-col gap-4">
+              <div className="bg-white rounded-2xl shadow-sm border border-sage-100 p-4 w-full flex flex-col gap-3">
                 <div className="text-center">
                   <h2 className="text-base font-bold text-sage-900">계좌이체</h2>
-                  <p className="text-xs text-gray-400 mt-1">아래 계좌로 정확한 금액을 이체해주세요</p>
+                  <p className="text-xs text-gray-400 mt-0.5">아래 계좌로 정확한 금액을 이체해주세요</p>
                 </div>
                 <div className="bg-sage-50 rounded-xl px-4 py-4 flex flex-col gap-2">
                   <div className="flex justify-between text-sm">
@@ -208,9 +203,9 @@ export default function OrderPage({ params }: Props) {
 
             {/* 현금 */}
             {payMethod === 'cash' && (
-              <div className="bg-white rounded-2xl shadow-sm border border-sage-100 p-6 w-full flex flex-col items-center gap-4 text-center">
-                <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center">
-                  <span className="text-3xl">💵</span>
+              <div className="bg-white rounded-2xl shadow-sm border border-sage-100 p-4 w-full flex flex-col items-center gap-3 text-center">
+                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
+                  <span className="text-2xl">💵</span>
                 </div>
                 <div>
                   <h2 className="text-base font-bold text-gray-900">카운터에서 결제해주세요</h2>
