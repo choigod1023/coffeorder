@@ -14,8 +14,8 @@ export default function MenuItem({ item, cartQty, onPress }: MenuItemProps) {
       onClick={onPress}
       className="w-full text-left rounded-2xl overflow-hidden bg-white shadow-sm active:scale-[0.97] transition-transform"
     >
-      <div className="relative w-full aspect-square bg-gradient-to-br from-sage-600 to-sage-400 flex items-center justify-center">
-        <span className="text-7xl">{item.category === '논커피' ? '🌿' : '☕'}</span>
+      <div className="relative w-full aspect-video bg-gradient-to-br from-sage-600 to-sage-400 flex items-center justify-center">
+        <span className="text-5xl">{item.category === '논커피' ? '🌿' : '☕'}</span>
         {cartQty > 0 && (
           <span className="absolute top-2.5 right-2.5 w-7 h-7 bg-sage-800 rounded-full flex items-center justify-center text-white text-xs font-bold">
             {cartQty}
