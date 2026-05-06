@@ -136,6 +136,15 @@ export default function TrackPage({ params }: Props) {
           <OrderStatusTracker status={status} />
         </div>
 
+        {status === 'pending' && order && (
+          <Link
+            href={`/order/${id}?total=${order.totalPrice}&name=${encodeURIComponent(order.customerName)}`}
+            className="w-full py-3 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-sm font-bold text-center transition-colors block"
+          >
+            결제하기
+          </Link>
+        )}
+
         {canCancel && (
           <button
             onClick={() => setShowCancelModal(true)}
