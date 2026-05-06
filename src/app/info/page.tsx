@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, MapPin, BookOpen, Coffee, ExternalLink } from 'lucide-react';
+import { FaInstagram } from 'react-icons/fa';
+import { GiCoffeeBeans } from 'react-icons/gi';
 import Link from 'next/link';
 
 export default function InfoPage() {
@@ -31,7 +33,7 @@ export default function InfoPage() {
           <p className="text-xs text-gray-400 font-medium mb-3">원두 파트너</p>
           <div className="flex items-center gap-4 mb-4">
             <div className="w-11 h-11 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-center shrink-0">
-              <span className="text-2xl">🫘</span>
+              <GiCoffeeBeans className="w-6 h-6 text-amber-700" />
             </div>
             <div>
               <p className="font-bold text-gray-800 text-sm">빈브라더스</p>
@@ -89,7 +91,7 @@ export default function InfoPage() {
           className="bg-white rounded-2xl border border-sage-100 shadow-sm p-5 flex items-center gap-4 hover:bg-sage-50 transition-colors active:scale-[0.98]"
         >
           <div className="w-11 h-11 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shrink-0">
-            <span className="text-2xl">📸</span>
+            <FaInstagram className="w-6 h-6 text-white" />
           </div>
           <div>
             <p className="font-bold text-gray-800 text-sm">인스타그램</p>
