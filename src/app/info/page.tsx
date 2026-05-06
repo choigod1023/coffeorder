@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, MapPin, BookOpen, Coffee, ExternalLink } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 
 export default function InfoPage() {
@@ -41,7 +40,7 @@ export default function InfoPage() {
           </div>
           <div className="flex gap-2">
             <a
-              href="https://www.instagram.com/beanbrothers_official/"
+              href="https://www.instagram.com/bean_brothers?igsh=b2w0YnRpbWhxZzVq"
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => window.gtag?.('event', 'click', { event_category: 'outbound', event_label: 'beanbrothers_instagram' })}
@@ -60,13 +59,6 @@ export default function InfoPage() {
               홈페이지
             </a>
           </div>
-        </div>
-
-        {/* SCC Hero */}
-        <div className="bg-gradient-to-r from-sage-600 to-sage-400 rounded-2xl p-6 text-white text-center">
-          <Image src="/logo.png" alt="상록수커피클럽" width={80} height={80} className="rounded-full mx-auto mb-3 border-2 border-white/30" />
-          <h2 className="text-xl font-bold">상록수커피클럽</h2>
-          <p className="text-white/70 text-sm mt-1">SCC · 동국대학교 봄 축제</p>
         </div>
 
         {/* 부스 위치 */}
