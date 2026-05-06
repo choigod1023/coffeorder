@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, MapPin, BookOpen, Coffee, ExternalLink } from 'lucide-react';
 import { FaInstagram } from 'react-icons/fa';
-import { GiCoffeeBeans } from 'react-icons/gi';
+import { CoffeeBean } from '@phosphor-icons/react';
 import Link from 'next/link';
 
 export default function InfoPage() {
@@ -33,7 +33,7 @@ export default function InfoPage() {
           <p className="text-xs text-gray-400 font-medium mb-3">원두 파트너</p>
           <div className="flex items-center gap-4 mb-4">
             <div className="w-11 h-11 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-center shrink-0">
-              <GiCoffeeBeans className="w-6 h-6 text-amber-700" />
+              <CoffeeBean size={24} weight="fill" className="text-amber-700" />
             </div>
             <div>
               <p className="font-bold text-gray-800 text-sm">빈브라더스</p>
