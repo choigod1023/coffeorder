@@ -11,7 +11,7 @@ export default function InfoPage() {
   return (
     <div className="min-h-screen bg-sage-50">
       <header className="bg-white border-b border-sage-100 shadow-sm">
-        <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-3">
+        <div className="max-w-md mx-auto px-4 h-14 flex items-center gap-3">
           <button
             onClick={() => router.back()}
             className="p-2.5 rounded-full hover:bg-gray-100 transition-colors"

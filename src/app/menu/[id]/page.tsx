@@ -71,7 +71,7 @@ export default function MenuDetailPage({ params }: Props) {
     <div className="min-h-screen bg-sage-50">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white border-b border-sage-100 shadow-sm">
-        <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-md mx-auto px-4 h-14 flex items-center justify-between">
           <button
             onClick={() => router.back()}
             className="p-2.5 rounded-full hover:bg-gray-100 transition-colors"
@@ -135,7 +135,7 @@ export default function MenuDetailPage({ params }: Props) {
 
         {isAtLimit && (
           <div className="mt-4 bg-orange-50 border border-orange-200 rounded-xl px-4 py-3 text-sm text-orange-700 font-medium text-center">
-            10잔 이상 주문은 카운터로 문의해주세요
+            장바구니가 가득 찼어요 (최대 10잔) · 10잔 초과 주문은 카운터로 문의해주세요
           </div>
         )}
       </div>

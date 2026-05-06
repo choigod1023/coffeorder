@@ -93,7 +93,7 @@ export default function TrackPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-sage-50 flex flex-col">
       <header className="bg-white border-b border-sage-100 shadow-sm">
-        <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-2">
+        <div className="max-w-md mx-auto px-4 h-14 flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2">
             <Coffee className="w-5 h-5 text-sage-700" />
             <h1 className="text-base font-bold text-sage-900">주문 현황</h1>
@@ -177,9 +177,9 @@ export default function TrackPage({ params }: Props) {
         <div className="bg-sage-100/50 rounded-xl p-4">
           <p className="text-xs text-sage-800 font-medium mb-1">안내</p>
           <ul className="text-xs text-sage-700 space-y-1">
-            <li>• 음료 준비 시 알림이 표시됩니다</li>
-            <li>• 이 화면을 닫지 마세요</li>
-            <li>• 수령 후 자동으로 다음 페이지로 이동합니다</li>
+            <li>• 음료가 준비되면 이 화면에 알림이 표시됩니다</li>
+            <li>• 화면을 닫지 않으면 실시간으로 확인할 수 있어요</li>
+            <li>• 수령 완료 후 자동으로 다음 화면으로 이동합니다</li>
           </ul>
         </div>
       </main>
@@ -196,7 +196,7 @@ export default function TrackPage({ params }: Props) {
                 <X className="w-7 h-7 text-red-500" />
               </div>
               <h2 className="text-lg font-bold text-gray-900">주문을 취소하시겠어요?</h2>
-              <p className="text-sm text-gray-500 mt-1">환불은 관리자가 토스로 직접 송금해드립니다</p>
+              <p className="text-sm text-gray-500 mt-1">환불은 스태프가 직접 처리해드립니다</p>
             </div>
             <div className="flex gap-2">
               <button

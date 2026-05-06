@@ -17,7 +17,7 @@ export default function CompletePage({ params }: Props) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-amber-100 flex flex-col">
       <header className="bg-white/70 backdrop-blur-sm border-b border-amber-100">
-        <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-2">
+        <div className="max-w-md mx-auto px-4 h-14 flex items-center gap-2">
           <Coffee className="w-5 h-5 text-amber-700" />
           <h1 className="text-base font-bold text-amber-900">수령 완료</h1>
         </div>

@@ -171,7 +171,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-sage-50">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white border-b border-sage-100 shadow-sm">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <Image src="/logo-nav.png" alt="상록수커피클럽" width={40} height={40} className="object-contain" />
             <h1 className="text-base font-bold text-sage-900 leading-tight">상록수커피클럽</h1>
@@ -225,14 +225,14 @@ export default function HomePage() {
           <Image src="/logo.png" alt="상록수커피클럽" width={80} height={80} className="rounded-full shrink-0 border-2 border-white/30" />
           <div>
             <p className="text-white/70 text-sm font-medium mb-1">상록수커피클럽</p>
-            <h2 className="text-xl font-bold leading-snug">음료를 고르고<br />토스로 결제하면</h2>
+            <h2 className="text-xl font-bold leading-snug">음료를 고르고<br />결제하면 끝!</h2>
             <p className="text-white/70 text-xs mt-1.5">준비되는 동안 실시간으로 알려드려요</p>
           </div>
         </div>
 
         {isAtLimit && (
           <div className="mb-4 bg-orange-50 border border-orange-200 rounded-xl px-4 py-3 text-sm text-orange-700 font-medium text-center">
-            10잔 이상 주문은 카운터로 문의해주세요
+            장바구니가 가득 찼어요 (최대 10잔) · 10잔 초과 주문은 카운터로 문의해주세요
           </div>
         )}
 

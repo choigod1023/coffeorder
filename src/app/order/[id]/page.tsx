@@ -88,7 +88,7 @@ export default function OrderPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-sage-50 flex flex-col">
       <header className="bg-white border-b border-sage-100 shadow-sm">
-        <div className="max-w-md mx-auto px-4 py-4 flex items-center gap-2">
+        <div className="max-w-md mx-auto px-4 h-14 flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2">
             <Coffee className="w-5 h-5 text-sage-700" />
             <h1 className="text-base font-bold text-sage-900">결제</h1>
@@ -165,7 +165,7 @@ export default function OrderPage({ params }: Props) {
                     토스 앱으로 바로 송금
                   </button>
                 )}
-                <p className="text-xs text-gray-400 text-center">송금 후 관리자가 확인하면 자동으로 진행됩니다</p>
+                <p className="text-xs text-gray-400 text-center">송금 후 스태프가 확인하면 자동으로 진행됩니다</p>
               </div>
             )}
 
@@ -202,7 +202,7 @@ export default function OrderPage({ params }: Props) {
                     <span className="font-bold text-sage-700 text-base">{total.toLocaleString('ko-KR')}원</span>
                   </div>
                 </div>
-                <p className="text-xs text-gray-400 text-center">이체 후 관리자가 확인하면 자동으로 진행됩니다</p>
+                <p className="text-xs text-gray-400 text-center">이체 후 스태프가 확인하면 자동으로 진행됩니다</p>
               </div>
             )}
 
@@ -227,7 +227,7 @@ export default function OrderPage({ params }: Props) {
             {/* 대기 중 인디케이터 */}
             <div className="flex items-center gap-2 text-sage-600">
               <div className="w-4 h-4 border-2 border-sage-500 border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm font-semibold">관리자 확인 대기 중...</p>
+              <p className="text-sm font-semibold">스태프 확인 대기 중...</p>
             </div>
           </>
         )}
