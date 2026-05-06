@@ -133,6 +133,11 @@ export default function MenuDetailPage({ params }: Props) {
           <p className="text-gray-500 text-sm leading-relaxed mt-2">{item.intro}</p>
         )}
 
+        <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800 leading-relaxed">
+          <p className="font-semibold mb-0.5">추가 요청사항 안내</p>
+          <p>저희 커피는 필터커피로 제공되어 시럽 추가, 샷 추가 등 별도 요청사항 수용이 어렵습니다.</p>
+        </div>
+
         {isAtLimit && (
           <div className="mt-4 bg-orange-50 border border-orange-200 rounded-xl px-4 py-3 text-sm text-orange-700 font-medium text-center">
             장바구니가 가득 찼어요 (최대 10잔) · 10잔 초과 주문은 카운터로 문의해주세요
