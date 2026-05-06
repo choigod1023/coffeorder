@@ -100,7 +100,24 @@ export default function HomePage() {
   const getMenuCartQty = (menuId: string): number =>
     cart.filter((c) => c.menuId === menuId).reduce((s, c) => s + c.quantity, 0);
 
-  // 바텀시트 열릴 때 히스토리 엔트리 push → 뒤로가기 제스처로 닫기 가능
+  // 장바구니 드로어 열릴 때 히스토리 엔트리 push → 뒤로가기 제스처로 닫기 가능
+  useEffect(() => {
+    if (!isCartOpen) return;
+    window.history.pushState({ modal: 'cart' }, '');
+    const handlePopState = () => setIsCartOpen(false);
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [isCartOpen]);
+
+  const closeCart = useCallback(() => {
+    if (window.history.state?.modal === 'cart') {
+      window.history.back();
+    } else {
+      setIsCartOpen(false);
+    }
+  }, []);
+
+  // 메뉴 바텀시트 열릴 때 히스토리 엔트리 push → 뒤로가기 제스처로 닫기 가능
   useEffect(() => {
     if (!selectedMenu) return;
     window.history.pushState({ modal: 'menu' }, '');
@@ -158,7 +175,7 @@ export default function HomePage() {
 
   const handleOrderClick = () => {
     if (cart.length === 0) return;
-    setIsCartOpen(false);
+    closeCart();
     setCustomerName('');
     setNameError('');
     setShowNameModal(true);
@@ -443,7 +460,7 @@ export default function HomePage() {
         <div className="fixed inset-0 z-50 flex flex-col justify-end">
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            onClick={() => setIsCartOpen(false)}
+            onClick={closeCart}
           />
           <div className="relative bg-white rounded-t-3xl shadow-2xl max-h-[80vh] flex flex-col">
             <div className="flex justify-center pt-3 pb-1">
@@ -452,7 +469,7 @@ export default function HomePage() {
             <div className="flex items-center justify-between px-5 py-3 border-b border-sage-100">
               <h2 className="text-lg font-bold text-sage-900">장바구니</h2>
               <button
-                onClick={() => setIsCartOpen(false)}
+                onClick={closeCart}
                 className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
               >
                 <X className="w-4 h-4 text-gray-500" />
