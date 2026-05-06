@@ -9,7 +9,7 @@ import { ShoppingCart, X, Info, Plus, Minus, Check, Clock } from 'lucide-react';
 import { createOrder, getOrderStatus, subscribeToWaitQueueCount, calcWaitTimeText } from '@/lib/orders';
 import { MENU } from '@/lib/menu';
 import { getCart, saveCart } from '@/lib/cart';
-import { getActiveOrder, saveActiveOrder, clearActiveOrder, ActiveOrderInfo } from '@/lib/activeOrder';
+import { getActiveOrders, addActiveOrder, removeActiveOrder, ActiveOrderInfo } from '@/lib/activeOrder';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -25,7 +25,8 @@ export default function HomePage() {
   const [customerName, setCustomerName] = useState('');
   const [nameError, setNameError] = useState('');
 
-  const [activeOrder, setActiveOrder] = useState<ActiveOrderInfo | null>(null);
+  const [activeOrders, setActiveOrders] = useState<ActiveOrderInfo[]>([]);
+  const [showActiveOrders, setShowActiveOrders] = useState(false);
   const [waitQueueCount, setWaitQueueCount] = useState(0);
 
   // 메뉴 상세 모달 상태
@@ -41,16 +42,20 @@ export default function HomePage() {
 
   useEffect(() => {
     setCart(getCart());
-    const stored = getActiveOrder();
-    if (stored) {
-      getOrderStatus(stored.orderId).then((status) => {
+    const stored = getActiveOrders();
+    if (stored.length === 0) return;
+    Promise.all(
+      stored.map(async (o) => {
+        const status = await getOrderStatus(o.orderId);
         if (!status || status === 'picked_up' || status === 'cancelled') {
-          clearActiveOrder();
-        } else {
-          setActiveOrder(stored);
+          removeActiveOrder(o.orderId);
+          return null;
         }
-      });
-    }
+        return o;
+      })
+    ).then((results) => {
+      setActiveOrders(results.filter((o): o is ActiveOrderInfo => o !== null));
+    });
   }, []);
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -95,7 +100,18 @@ export default function HomePage() {
   const getMenuCartQty = (menuId: string): number =>
     cart.filter((c) => c.menuId === menuId).reduce((s, c) => s + c.quantity, 0);
 
-  // 메뉴 모달 열기
+  // 바텀시트 열릴 때 히스토리 엔트리 push → 뒤로가기 제스처로 닫기 가능
+  useEffect(() => {
+    if (!selectedMenu) return;
+    window.history.pushState({ modal: 'menu' }, '');
+    const handlePopState = () => {
+      setSelectedMenu(null);
+      setJustAdded(false);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [selectedMenu]);
+
   const openMenuModal = useCallback((item: MenuItem) => {
     setSelectedMenu(item);
     setModalOption(item.availableOptions[0]);
@@ -105,7 +121,11 @@ export default function HomePage() {
 
   const closeMenuModal = useCallback(() => {
     if (justAdded) return;
-    setSelectedMenu(null);
+    if (window.history.state?.modal === 'menu') {
+      window.history.back();
+    } else {
+      setSelectedMenu(null);
+    }
   }, [justAdded]);
 
   // 모달에서 담기
@@ -127,8 +147,12 @@ export default function HomePage() {
     setJustAdded(true);
     setTimeout(() => {
       setJustAdded(false);
-      setSelectedMenu(null);
       setAddQty(1);
+      if (window.history.state?.modal === 'menu') {
+        window.history.back();
+      } else {
+        setSelectedMenu(null);
+      }
     }, 800);
   }, [selectedMenu, modalOption, addQty, isAtLimit, remainingSlots]);
 
@@ -155,7 +179,8 @@ export default function HomePage() {
         option: item.option,
       }));
       const orderId = await createOrder(trimmed, items, totalPrice);
-      saveActiveOrder({ orderId, total: totalPrice, name: trimmed });
+      addActiveOrder({ orderId, total: totalPrice, name: trimmed });
+      setActiveOrders((prev) => [...prev, { orderId, total: totalPrice, name: trimmed }]);
       setShowNameModal(false);
       updateCart([]);
       router.push(`/order/${orderId}?total=${totalPrice}&name=${encodeURIComponent(trimmed)}`);
@@ -202,9 +227,9 @@ export default function HomePage() {
       {/* Main */}
       <main className="max-w-2xl mx-auto px-4 pb-32">
         {/* 진행 중인 주문 배너 */}
-        {activeOrder && (
+        {activeOrders.length === 1 && (
           <Link
-            href={`/track/${activeOrder.orderId}`}
+            href={`/track/${activeOrders[0].orderId}`}
             className="mt-4 flex items-center justify-between gap-3 bg-sage-800 text-white rounded-2xl px-4 py-3.5 shadow-md active:scale-[0.98] transition-transform"
           >
             <div className="flex items-center gap-3">
@@ -213,11 +238,47 @@ export default function HomePage() {
               </div>
               <div>
                 <p className="text-xs text-sage-300 font-medium">진행 중인 주문</p>
-                <p className="text-sm font-bold">{activeOrder.name}님 · {activeOrder.total.toLocaleString('ko-KR')}원</p>
+                <p className="text-sm font-bold">{activeOrders[0].name}님 · {activeOrders[0].total.toLocaleString('ko-KR')}원</p>
               </div>
             </div>
             <span className="text-xs text-sage-300 shrink-0">현황 보기 →</span>
           </Link>
+        )}
+        {activeOrders.length > 1 && (
+          <div className="mt-4 bg-sage-800 text-white rounded-2xl shadow-md overflow-hidden">
+            <button
+              onClick={() => setShowActiveOrders((v) => !v)}
+              className="w-full flex items-center justify-between gap-3 px-4 py-3.5 active:bg-sage-700 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-sage-600 rounded-full flex items-center justify-center shrink-0">
+                  <div className="w-2.5 h-2.5 bg-white rounded-full animate-pulse" />
+                </div>
+                <div className="text-left">
+                  <p className="text-xs text-sage-300 font-medium">진행 중인 주문</p>
+                  <p className="text-sm font-bold">{activeOrders.length}건 진행 중</p>
+                </div>
+              </div>
+              <span className="text-xs text-sage-300 shrink-0">{showActiveOrders ? '접기 ↑' : '보기 ↓'}</span>
+            </button>
+            {showActiveOrders && (
+              <div className="border-t border-sage-700 divide-y divide-sage-700">
+                {activeOrders.map((o) => (
+                  <Link
+                    key={o.orderId}
+                    href={`/track/${o.orderId}`}
+                    className="flex items-center justify-between px-4 py-3 hover:bg-sage-700 transition-colors"
+                  >
+                    <div>
+                      <p className="text-sm font-bold">{o.name}님</p>
+                      <p className="text-xs text-sage-300">{o.orderId} · {o.total.toLocaleString('ko-KR')}원</p>
+                    </div>
+                    <span className="text-xs text-sage-300 shrink-0">현황 보기 →</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         )}
 
         {/* Hero */}

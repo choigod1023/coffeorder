@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { OrderStatus } from '@/types';
 import OrderStatusTracker from '@/components/OrderStatus';
 import { subscribeToOrder, cancelOrder, subscribeToWaitQueueCount, calcWaitTimeText, FirebaseOrder } from '@/lib/orders';
-import { clearActiveOrder } from '@/lib/activeOrder';
+import { removeActiveOrder } from '@/lib/activeOrder';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -55,7 +55,7 @@ export default function TrackPage({ params }: Props) {
       setOrder(o);
       if (o.status === 'ready') setShowReadyBanner(true);
       if (o.status === 'picked_up' || o.status === 'cancelled') {
-        clearActiveOrder();
+        removeActiveOrder(id);
       }
       if (o.status === 'picked_up') {
         setTimeout(() => router.push(`/complete/${id}`), 1500);
