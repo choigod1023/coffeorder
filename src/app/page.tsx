@@ -46,11 +46,22 @@ export default function HomePage() {
     return unsubscribe;
   }, []);
 
-  // 바텀시트 열릴 때 배경 스크롤 잠금
+  // 바텀시트 열릴 때 배경 스크롤 잠금 (iOS Safari는 overflow:hidden만으로 부족 → position:fixed 필요)
   useEffect(() => {
     const locked = isCartOpen || !!selectedMenu || showNameModal;
-    document.body.style.overflow = locked ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    if (!locked) return;
+    const scrollY = window.scrollY;
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      window.scrollTo(0, scrollY);
+    };
   }, [isCartOpen, selectedMenu, showNameModal]);
 
   useEffect(() => {
