@@ -256,7 +256,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-sage-50">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white border-b border-sage-100 shadow-sm">
-        <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
+        <div className="max-w-md mx-auto px-4 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <Image src="/logo-nav.png" alt="상록수커피클럽" width={40} height={40} className="object-contain" />
             <h1 className="text-base font-bold text-sage-900 leading-tight">상록수커피클럽</h1>
@@ -285,7 +285,7 @@ export default function HomePage() {
       </header>
 
       {/* Main */}
-      <main className="max-w-2xl mx-auto px-4 pb-24">
+      <main className="max-w-md mx-auto px-4 pb-24">
         {/* 진행 중인 주문 배너 */}
         {activeOrders.length === 1 && (
           <Link
@@ -373,7 +373,7 @@ export default function HomePage() {
       {/* Sticky cart bar */}
       {totalItems > 0 && (
         <div className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-sage-100 shadow-lg">
-          <div className="max-w-2xl mx-auto px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+          <div className="max-w-md mx-auto px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
             <button
               onClick={() => setIsCartOpen(true)}
               className="w-full bg-sage-600 hover:bg-sage-700 active:bg-sage-800 text-white rounded-2xl py-5 px-5 flex items-center justify-between transition-colors"
@@ -592,15 +592,15 @@ export default function HomePage() {
               <div className="mx-auto mb-3 w-14 h-14">
                 <Image src="/logo.png" alt="상록수커피클럽" width={56} height={56} className="rounded-full" />
               </div>
-              <h2 className="text-lg font-bold text-gray-900">실명을 입력해주세요</h2>
-              <p className="text-sm text-gray-500 mt-1">음료 수령 시 실명으로 확인합니다</p>
+              <h2 className="text-lg font-bold text-gray-900">수령 시 어떻게 불러드릴까요?</h2>
+              <p className="text-sm text-gray-500 mt-1">음료 수령 시 입력하신 닉네임으로 확인합니다</p>
             </div>
             <input
               type="text"
               value={customerName}
               onChange={(e) => { setCustomerName(e.target.value); setNameError(''); }}
               onKeyDown={(e) => { if (e.key === 'Enter') handleConfirmOrder(); }}
-              placeholder="실명 입력 (최대 5자)"
+              placeholder="닉네임 입력 (최대 5자)"
               maxLength={5}
               autoFocus
               className="w-full border-2 border-sage-200 focus:border-sage-500 rounded-xl px-4 py-4 text-base text-gray-800 placeholder-gray-400 outline-none transition-colors text-center font-semibold"

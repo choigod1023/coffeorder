@@ -5,6 +5,7 @@ import { ArrowLeft, MapPin, BookOpen, Coffee, ExternalLink } from 'lucide-react'
 import { FaInstagram } from 'react-icons/fa';
 import { CoffeeBean } from '@phosphor-icons/react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function InfoPage() {
   const router = useRouter();
@@ -20,7 +21,7 @@ export default function InfoPage() {
             <ArrowLeft className="w-5 h-5 text-gray-600" />
           </button>
           <Link href="/" className="flex items-center gap-2">
-            <Coffee className="w-5 h-5 text-sage-700" />
+            <Image src="/logo-nav.png" alt="상록수커피클럽" width={40} height={40} className="object-contain" />
             <h1 className="text-base font-bold text-sage-900">상록수커피클럽 안내</h1>
           </Link>
         </div>

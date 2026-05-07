@@ -3,6 +3,7 @@
 import { use, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Coffee, Heart, Star } from 'lucide-react';
+import Image from 'next/image';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -18,7 +19,7 @@ export default function CompletePage({ params }: Props) {
     <div className="min-h-screen bg-gradient-to-b from-sage-50 to-sage-100 flex flex-col">
       <header className="bg-white/70 backdrop-blur-sm border-b border-sage-100">
         <div className="max-w-md mx-auto px-4 h-14 flex items-center gap-2">
-          <Coffee className="w-5 h-5 text-sage-700" />
+          <Image src="/logo-nav.png" alt="상록수커피클럽" width={40} height={40} className="object-contain" />
           <h1 className="text-base font-bold text-sage-900">수령 완료</h1>
         </div>
       </header>
