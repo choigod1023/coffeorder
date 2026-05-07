@@ -256,12 +256,13 @@ export default function HomePage() {
     <div className="min-h-screen bg-sage-50">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white border-b border-sage-100 shadow-sm">
-        <div className="max-w-md mx-auto px-4 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
+        <div className="max-w-md mx-auto px-4 h-14 grid grid-cols-[80px_1fr_80px] items-center">
+          <div className="flex items-center justify-start w-20"></div>
+          <Link href="/" className="flex items-center gap-1 justify-self-center shrink-0">
             <Image src="/logo-nav.png" alt="상록수커피클럽" width={40} height={40} className="object-contain" />
-            <h1 className="text-base font-bold text-sage-900 leading-tight">상록수커피클럽</h1>
+            <h1 className="text-base font-bold text-sage-900 leading-tight">SCC</h1>
           </Link>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center justify-end gap-1 w-20">
             <button
               onClick={() => router.push('/info')}
               className="p-2 rounded-full hover:bg-sage-50 transition-colors"
@@ -342,7 +343,7 @@ export default function HomePage() {
         )}
 
         {/* Hero */}
-        <div className="mt-3 mb-3 rounded-2xl bg-gradient-to-r from-sage-600 to-sage-400 p-4 text-white flex items-center gap-4">
+        <div className="mt-3 mb-3 rounded-2xl bg-gradient-to-r from-[#008A44] to-[#33A169] p-4 text-white flex items-center gap-4">
           <Image src="/logo.png" alt="상록수커피클럽" width={56} height={56} className="rounded-full shrink-0 border-2 border-white/30" />
           <div>
             <p className="text-white/70 text-xs font-medium mb-0.5">상록수커피클럽</p>
