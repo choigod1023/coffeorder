@@ -14,7 +14,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 const MAX_ITEMS = 10;
-const OPTION_LABEL: Record<MenuOption, string> = { hot: '핫', ice: '아이스' };
+const OPTION_LABEL: Record<MenuOption, string> = { hot: '핫 8oz', ice: '아이스 14oz' };
 
 export default function HomePage() {
   const router = useRouter();
