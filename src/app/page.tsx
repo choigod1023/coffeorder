@@ -410,7 +410,15 @@ export default function HomePage() {
             {/* 스크롤 영역 */}
             <div className="overflow-y-auto flex-1">
               <div className="h-48 bg-gradient-to-br from-sage-600 to-sage-400 flex items-center justify-center">
-                <span className="text-8xl">{selectedMenu.category === '논커피' ? '🌿' : '☕'}</span>
+                  {selectedMenu.name === '나무' ?
+                  (
+                    <div className="relative w-40 h-40">
+                      <Image src="/logo.png" alt="상록수커피클럽" fill className="object-contain scale-90"/>
+                    </div>
+                  ) :
+                  (
+                    <span className="text-8xl">☕</span>
+                  )}
               </div>
 
               <div className="px-5 py-4 pb-2">

@@ -1,6 +1,7 @@
 'use client';
 
 import { MenuItem as MenuItemType } from '@/types';
+import Image from 'next/image';
 
 interface MenuItemProps {
   item: MenuItemType;
@@ -15,7 +16,14 @@ export default function MenuItem({ item, cartQty, onPress }: MenuItemProps) {
       className="w-full text-left rounded-2xl overflow-hidden bg-white shadow-sm active:scale-[0.97] transition-transform"
     >
       <div className="relative w-full aspect-video bg-gradient-to-br from-sage-600 to-sage-400 flex items-center justify-center">
-        <span className="text-5xl">{item.category === '논커피' ? '🌿' : '☕'}</span>
+        {item.name === '나무' ?
+        (
+          <div>
+              <Image src="/logo.png" alt="상록수커피클럽" fill className="object-contain scale-85"/>        
+          </div>
+        )
+        :
+        (<span className="text-5xl">☕</span>)}
         {cartQty > 0 && (
           <span className="absolute top-2.5 right-2.5 w-7 h-7 bg-sage-800 rounded-full flex items-center justify-center text-white text-xs font-bold">
             {cartQty}
