@@ -414,7 +414,7 @@ export default function HomePage() {
                   {selectedMenu.name === '나무' ?
                   (
                     <div className="relative w-40 h-40">
-                      <Image src="/logo.png" alt="상록수커피클럽" fill className="object-contain scale-90"/>
+                      <Image src="/logo.png" alt="상록수커피클럽" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-contain scale-90"/>
                     </div>
                   ) :
                   (

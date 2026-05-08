@@ -18,8 +18,8 @@ export default function MenuItem({ item, cartQty, onPress }: MenuItemProps) {
       <div className="relative w-full aspect-video bg-gradient-to-br from-sage-600 to-sage-400 flex items-center justify-center">
         {item.name === '나무' ?
         (
-          <div>
-              <Image src="/logo.png" alt="상록수커피클럽" fill className="object-contain scale-85"/>        
+          <div className="relative w-full h-full">
+              <Image src="/logo.png" alt="상록수커피클럽" fill priority sizes="(max-width: 768px) 100vw, 33vw" className="object-contain scale-85"/>        
           </div>
         )
         :
