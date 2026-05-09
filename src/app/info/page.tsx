@@ -5,24 +5,30 @@ import { ArrowLeft, MapPin, BookOpen, Coffee, ExternalLink } from 'lucide-react'
 import { FaInstagram } from 'react-icons/fa';
 import { CoffeeBean } from '@phosphor-icons/react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function InfoPage() {
   const router = useRouter();
 
   return (
     <div className="min-h-screen bg-sage-50">
-      <header className="bg-white border-b border-sage-100 shadow-sm">
-        <div className="max-w-md mx-auto px-4 h-14 flex items-center gap-3">
-          <button
-            onClick={() => router.back()}
-            className="p-2.5 rounded-full hover:bg-gray-100 transition-colors"
-          >
+      <header className="sticky top-0 z-40 bg-white border-b border-sage-100 shadow-sm">
+        <div className="max-w-md mx-auto px-4 h-14 grid grid-cols-[80px_1fr_80px] items-center">
+          <div className="flex items-center justify-start w-20">
+            <button
+              onClick={() => router.back()}
+              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+            >
             <ArrowLeft className="w-5 h-5 text-gray-600" />
-          </button>
-          <Link href="/" className="flex items-center gap-2">
-            <Coffee className="w-5 h-5 text-sage-700" />
-            <h1 className="text-base font-bold text-sage-900">상록수커피클럽 안내</h1>
+            </button>
+          </div>
+          <Link href="/" className="flex items-center gap-1 justify-self-center shrink-0">
+            <Image src="/logo-nav.png" alt="상록수커피클럽" width={40} height={40} className="object-contain" />
+            <h1 className="text-base font-bold text-sage-900 leading-tight">SCC</h1>
           </Link>
+          <div className="flex items-center justify-end gap-1 w-20">
+            
+          </div>
         </div>
       </header>
 
