@@ -467,7 +467,7 @@ export default function HomePage() {
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={closeMenuModal}
           />
-          <div ref={menuSheetRef} className="relative bg-white rounded-t-3xl lg:rounded-3xl shadow-2xl h-[100dvh] lg:h-auto lg:max-h-[85vh] lg:w-full lg:max-w-lg flex flex-col overflow-hidden">
+          <div ref={menuSheetRef} className="relative bg-white rounded-t-3xl lg:rounded-3xl shadow-2xl h-[100dvh] lg:h-[85vh] lg:w-full lg:max-w-lg flex flex-col overflow-hidden">
             <div
               className="flex justify-center pt-4 pb-3 shrink-0 touch-none lg:hidden"
               onTouchStart={menuDrag.onTouchStart}
