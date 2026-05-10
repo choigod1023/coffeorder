@@ -44,14 +44,6 @@ function StatusIcon({ status }: { status: OrderStatus }) {
 
 type PushState = 'idle' | 'subscribed' | 'denied' | 'unsupported';
 
-function urlBase64ToUint8Array(base64String: string): Uint8Array {
-  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  const rawData = window.atob(base64);
-  const output = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; i++) output[i] = rawData.charCodeAt(i);
-  return output;
-}
 
 export default function TrackPage({ params }: Props) {
   const { id } = use(params);
@@ -116,7 +108,7 @@ export default function TrackPage({ params }: Props) {
       if (!sub) {
         sub = await reg.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(vapidKey),
+          applicationServerKey: vapidKey,
         });
       }
       await savePushSubscription(id, sub);
