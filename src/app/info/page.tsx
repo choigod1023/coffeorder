@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { ArrowLeft, MapPin, ExternalLink } from 'lucide-react';
 import { FaInstagram } from 'react-icons/fa';
 import Image from 'next/image';
@@ -18,10 +19,10 @@ export default function InfoPage() {
           >
             <ArrowLeft className="w-5 h-5 text-gray-600" />
           </button>
-          <div className="flex items-center justify-center gap-1">
+          <Link href="/" className="flex items-center justify-center gap-1">
             <Image src="/logo-nav.png" alt="상록수커피클럽" width={40} height={40} className="object-contain" />
             <span className="text-base font-bold text-sage-900">상록수커피클럽</span>
-          </div>
+          </Link>
           <div />
         </div>
       </header>
