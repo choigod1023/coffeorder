@@ -3,7 +3,6 @@
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, MapPin, ExternalLink } from 'lucide-react';
 import { FaInstagram } from 'react-icons/fa';
-import { CoffeeBean } from '@phosphor-icons/react';
 import Image from 'next/image';
 
 export default function InfoPage() {
@@ -43,8 +42,8 @@ export default function InfoPage() {
           <div className="px-5 pt-5 pb-4">
             <p className="text-[11px] text-gray-400 font-semibold uppercase tracking-wider mb-3">원두 파트너</p>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-center shrink-0">
-                <CoffeeBean size={26} weight="fill" className="text-amber-700" />
+              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shrink-0 overflow-hidden">
+                <Image src="/bean-brothers-logo.svg" alt="Bean Brothers" width={40} height={29} className="object-contain" />
               </div>
               <div>
                 <p className="font-bold text-gray-900">빈브라더스</p>

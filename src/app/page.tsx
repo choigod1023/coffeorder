@@ -452,7 +452,7 @@ export default function HomePage() {
 
             {/* 스크롤 영역 */}
             <div data-scroll-allow className="overflow-y-auto flex-1">
-              <div className="h-48 relative overflow-hidden">
+              <div className="w-full aspect-square relative overflow-hidden">
                 {selectedMenu.image ? (
                   <Image
                     src={selectedMenu.image}

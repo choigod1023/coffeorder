@@ -101,7 +101,7 @@ export default function MenuDetailPage({ params }: Props) {
       </header>
 
       {/* Hero */}
-      <div className="w-full h-64 relative overflow-hidden">
+      <div className="w-full aspect-square relative overflow-hidden">
         {item.image ? (
           <Image
             src={item.image}
