@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { MENU } from '@/lib/menu';
 import { getCart, saveCart } from '@/lib/cart';
 import { CartItem, MenuOption } from '@/types';
+import { getFlavorColor } from '@/lib/flavor';
 import { ArrowLeft, Plus, Minus, ShoppingCart, Check } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -70,7 +71,7 @@ export default function MenuDetailPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-sage-50">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-white border-b border-sage-100 shadow-sm">
+      <header className="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm">
         <div className="max-w-md mx-auto px-4 h-14 flex items-center justify-between">
           <button
             onClick={() => router.back()}
@@ -114,20 +115,54 @@ export default function MenuDetailPage({ params }: Props) {
         </div>
         <p className="text-sage-600 font-bold text-xl mb-4">{item.price.toLocaleString('ko-KR')}원</p>
 
-        {item.description && (
-          <p className="text-gray-600 text-sm mb-4 leading-relaxed">{item.description}</p>
-        )}
-        {item.beanBrand && (
-          <div className="bg-white rounded-xl border border-sage-200 px-4 py-3 mb-3">
-            <p className="text-xs text-sage-600 font-medium mb-0.5">원두</p>
-            <p className="text-sm text-gray-800 font-semibold">{item.beanBrand}</p>
-          </div>
-        )}
+        {/* 컵 노트 — 가격 바로 아래 */}
         {item.cupNotes && (
-          <div className="bg-white rounded-xl border border-sage-200 px-4 py-3 mb-3">
-            <p className="text-xs text-sage-600 font-medium mb-0.5">컵 노트</p>
-            <p className="text-sm text-gray-800">{item.cupNotes}</p>
+          <div className="mb-4">
+            <p className="text-xs text-gray-500 font-semibold mb-2">컵 노트</p>
+            <div className="flex flex-wrap gap-1.5">
+              {item.cupNotes.split(',').map((note) => {
+                const c = getFlavorColor(note);
+                return (
+                  <span
+                    key={note}
+                    style={{ backgroundColor: c.bg, color: c.text, borderColor: c.border }}
+                    className="text-xs border px-2.5 py-1 rounded-full font-semibold"
+                  >
+                    {note.trim()}
+                  </span>
+                );
+              })}
+            </div>
           </div>
+        )}
+
+        {/* 원두 카드 */}
+        {(item.beanBrand || item.origins) && (
+          <div className="bg-gray-50 rounded-xl px-4 py-3 mb-4">
+            <p className="text-xs text-gray-500 font-semibold mb-2">원두</p>
+            {item.beanBrand && (
+              <p className="text-sm font-bold text-gray-900 mb-2">{item.beanBrand}</p>
+            )}
+            {item.origins && (
+              <div className="space-y-2">
+                {item.origins.map((o) => (
+                  <div key={o.name} className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                      <span className="text-xs font-semibold text-gray-800">{o.name}</span>
+                      {o.region && (
+                        <span className="text-[10px] text-gray-400">{o.region}</span>
+                      )}
+                    </div>
+                    <span className="text-xs font-bold text-gray-500 shrink-0">{o.ratio}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {item.description && (
+          <p className="text-gray-400 text-sm mb-4 leading-relaxed">{item.description}</p>
         )}
         {item.intro && (
           <p className="text-gray-500 text-sm leading-relaxed mt-2">{item.intro}</p>
@@ -145,12 +180,11 @@ export default function MenuDetailPage({ params }: Props) {
         )}
       </div>
 
-      {/* Bottom CTA — 레이아웃 고정, 전환 없음 */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-sage-100 shadow-lg">
+      {/* Bottom CTA */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 shadow-lg">
         <div className="max-w-md mx-auto px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex flex-col gap-3">
-          {/* 옵션 토글 */}
           {item.availableOptions.length > 1 && (
-            <div className="flex rounded-xl overflow-hidden border border-sage-200">
+            <div className="flex rounded-xl overflow-hidden border border-gray-200">
               {item.availableOptions.map((opt) => (
                 <button
                   key={opt}
@@ -158,7 +192,7 @@ export default function MenuDetailPage({ params }: Props) {
                   className={`flex-1 py-3 text-sm font-semibold transition-colors ${
                     selectedOption === opt
                       ? 'bg-sage-600 text-white'
-                      : 'bg-white text-gray-500 hover:bg-sage-50'
+                      : 'bg-white text-gray-500 hover:bg-gray-50'
                   }`}
                 >
                   {OPTION_LABEL[opt]}
@@ -167,21 +201,20 @@ export default function MenuDetailPage({ params }: Props) {
             </div>
           )}
 
-          {/* 수량 + 담기 — 항상 동일 레이아웃 */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center border-2 border-sage-200 rounded-xl overflow-hidden shrink-0">
+            <div className="flex items-center border-2 border-gray-200 rounded-xl overflow-hidden shrink-0">
               <button
                 onClick={decreaseAddQty}
                 disabled={addQty <= 1}
-                className="w-11 h-12 flex items-center justify-center text-sage-700 hover:bg-sage-50 disabled:text-gray-300 transition-colors"
+                className="w-11 h-12 flex items-center justify-center text-gray-600 hover:bg-gray-50 disabled:text-gray-300 transition-colors"
               >
                 <Minus className="w-4 h-4" />
               </button>
-              <span className="w-10 text-center font-bold text-sage-800 text-base">{addQty}</span>
+              <span className="w-10 text-center font-bold text-gray-800 text-base">{addQty}</span>
               <button
                 onClick={increaseAddQty}
                 disabled={isAtLimit || addQty >= remainingSlots}
-                className="w-11 h-12 flex items-center justify-center text-sage-700 hover:bg-sage-50 disabled:text-gray-300 transition-colors"
+                className="w-11 h-12 flex items-center justify-center text-gray-600 hover:bg-gray-50 disabled:text-gray-300 transition-colors"
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -192,7 +225,7 @@ export default function MenuDetailPage({ params }: Props) {
               disabled={isAtLimit || justAdded}
               className={`flex-1 h-12 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
                 justAdded
-                  ? 'bg-sage-100 text-sage-700 border-2 border-sage-300'
+                  ? 'bg-gray-100 text-gray-600 border-2 border-gray-200'
                   : 'bg-sage-600 hover:bg-sage-700 active:bg-sage-800 text-white disabled:bg-gray-200 disabled:text-gray-400'
               }`}
             >

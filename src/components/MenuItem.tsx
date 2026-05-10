@@ -1,7 +1,7 @@
 'use client';
 
 import { MenuItem as MenuItemType } from '@/types';
-import Image from 'next/image';
+import { getFlavorColor } from '@/lib/flavor';
 
 interface MenuItemProps {
   item: MenuItemType;
@@ -37,11 +37,18 @@ export default function MenuItem({ item, cartQty, onPress }: MenuItemProps) {
         <p className="text-sage-600 font-bold text-sm mb-1.5">{item.price.toLocaleString('ko-KR')}원</p>
         {item.tags && item.tags.length > 0 && (
           <div className="flex flex-wrap gap-1">
-            {item.tags.map((tag) => (
-              <span key={tag} className="text-[11px] bg-sage-50 text-sage-600 border border-sage-200 px-2 py-0.5 rounded-full font-medium">
-                {tag}
-              </span>
-            ))}
+            {item.tags.map((tag) => {
+              const c = getFlavorColor(tag);
+              return (
+                <span
+                  key={tag}
+                  style={{ backgroundColor: c.bg, color: c.text, borderColor: c.border }}
+                  className="text-[11px] border px-2 py-0.5 rounded-full font-medium"
+                >
+                  {tag}
+                </span>
+              );
+            })}
           </div>
         )}
       </div>

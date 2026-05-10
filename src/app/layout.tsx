@@ -17,7 +17,8 @@ export default function RootLayout({
       <head>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#577050" />
+        <link rel="icon" href="/logo.png" type="image/png" />
+        <meta name="theme-color" content="#3A5538" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="상록수커피클럽" />

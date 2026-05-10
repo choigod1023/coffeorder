@@ -2,7 +2,8 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { CartItem, MenuItem, MenuOption, BeanOrigin } from '@/types';
+import { CartItem, MenuItem, MenuOption } from '@/types';
+import { getFlavorColor } from '@/lib/flavor';
 import MenuItemCard from '@/components/MenuItem';
 import CartItemCard from '@/components/CartItem';
 import { ShoppingCart, X, Info, Plus, Minus, Check, Clock } from 'lucide-react';
@@ -13,34 +14,6 @@ import { getActiveOrders, addActiveOrder, removeActiveOrder, ActiveOrderInfo } f
 import Image from 'next/image';
 import Link from 'next/link';
 
-// 플레이버 휠 카테고리별 색상 매핑
-function getFlavorColor(note: string): { bg: string; text: string; border: string } {
-  const n = note.trim();
-  if (['복숭아', '자두', '살구', '체리', '넥타린'].some((k) => n.includes(k)))
-    return { bg: '#FFF0E8', text: '#B84020', border: '#F08060' }; // 핵과류
-  if (['오렌지', '레몬', '라임', '자몽', '귤', '시트러스'].some((k) => n.includes(k)))
-    return { bg: '#FFF8E0', text: '#986000', border: '#E8B020' }; // 시트러스
-  if (['재스민', '장미', '라벤더', '꽃'].some((k) => n.includes(k)))
-    return { bg: '#F8F0FF', text: '#6838A8', border: '#C090E0' }; // 꽃향
-  if (['초콜릿', '코코아', '다크'].some((k) => n.includes(k)))
-    return { bg: '#F8EDE8', text: '#5A2810', border: '#9A5030' }; // 초콜릿
-  if (['너트', '아몬드', '헤이즐넛', '로스팅', '고소'].some((k) => n.includes(k)))
-    return { bg: '#FFF4E8', text: '#6A4018', border: '#B07840' }; // 견과/구운
-  if (['단맛', '카라멜', '캐러멜', '브라운 슈거', '꿀', '바닐라', '설탕'].some((k) => n.includes(k)))
-    return { bg: '#FFFAE8', text: '#785018', border: '#C89038' }; // 달콤한
-  if (['홍차', '녹차', '허브', '민트'].some((k) => n.includes(k)))
-    return { bg: '#F0F8F2', text: '#285A38', border: '#60A870' }; // 허브/차
-  if (['베리', '블루베리', '라즈베리', '딸기', '크랜베리'].some((k) => n.includes(k)))
-    return { bg: '#FFF0F4', text: '#8A1830', border: '#C04060' }; // 베리
-  return { bg: '#F5F5F5', text: '#606060', border: '#D0D0D0' };
-}
-
-const ORIGIN_TYPE_STYLE: Record<BeanOrigin['type'], string> = {
-  '생산국':  'bg-blue-50   text-blue-700   border border-blue-200',
-  '농장':    'bg-amber-50  text-amber-700  border border-amber-200',
-  '협동조합': 'bg-purple-50 text-purple-700 border border-purple-200',
-  '지역':    'bg-sage-50   text-sage-700   border border-sage-200',
-};
 
 const MAX_ITEMS = 10;
 const OPTION_LABEL: Record<MenuOption, string> = { hot: '핫 8oz', ice: '아이스 14oz' };
@@ -306,7 +279,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-sage-50">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-white border-b border-sage-100 shadow-sm">
+      <header className="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm">
         <div className="max-w-md mx-auto px-4 h-14 grid grid-cols-[80px_1fr_80px] items-center">
           <div className="flex items-center justify-start w-20"></div>
           <button onClick={() => { window.location.href = '/'; }} className="flex items-center gap-1 justify-self-center shrink-0">
@@ -412,7 +385,7 @@ export default function HomePage() {
         )}
 
         {/* Hero */}
-        <div className="mt-3 mb-3 rounded-2xl bg-gradient-to-r from-[#008A44] to-[#33A169] p-4 text-white flex items-center gap-4">
+        <div className="mt-3 mb-3 rounded-2xl bg-gradient-to-r from-sage-700 to-sage-600 p-4 text-white flex items-center gap-4">
           <Image src="/logo.png" alt="상록수커피클럽" width={56} height={56} className="rounded-full shrink-0 border-2 border-white/30" />
           <div>
             <p className="text-white/70 text-xs font-medium mb-0.5">상록수커피클럽</p>
@@ -442,7 +415,7 @@ export default function HomePage() {
 
       {/* Sticky cart bar */}
       {totalItems > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-sage-100 shadow-lg">
+        <div className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-100 shadow-lg">
           <div className="max-w-md mx-auto px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
             <button
               onClick={() => setIsCartOpen(true)}
@@ -500,68 +473,65 @@ export default function HomePage() {
                 </div>
                 <p className="text-sage-600 font-bold text-lg mb-3">{selectedMenu.price.toLocaleString('ko-KR')}원</p>
 
-                {selectedMenu.description && (
-                  <p className="text-gray-600 text-sm mb-3 leading-relaxed">{selectedMenu.description}</p>
+                {/* 컵 노트 — 가격 바로 아래 */}
+                {selectedMenu.cupNotes && (
+                  <div className="mb-3">
+                    <p className="text-xs text-gray-500 font-semibold mb-2">컵 노트</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {selectedMenu.cupNotes.split(',').map((note) => {
+                        const c = getFlavorColor(note);
+                        return (
+                          <span
+                            key={note}
+                            style={{ backgroundColor: c.bg, color: c.text, borderColor: c.border }}
+                            className="text-xs border px-2.5 py-1 rounded-full font-semibold"
+                          >
+                            {note.trim()}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
                 )}
-                {(selectedMenu.beanBrand || selectedMenu.origins || selectedMenu.cupNotes) && (
-                  <div className="bg-sage-50 rounded-xl border border-sage-200 px-4 py-3.5 mb-2 space-y-3.5">
-                    {(selectedMenu.beanBrand || selectedMenu.origins) && (
-                      <div>
-                        <p className="text-xs text-sage-600 font-semibold mb-2">원두</p>
-                        {selectedMenu.beanBrand && (
-                          <p className="text-sm font-bold text-gray-900 mb-2">{selectedMenu.beanBrand}</p>
-                        )}
-                        {selectedMenu.origins && (
-                          <div className="space-y-2">
-                            {selectedMenu.origins.map((o) => (
-                              <div key={o.name} className="flex items-start justify-between gap-2">
-                                <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-                                  <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-semibold shrink-0 ${ORIGIN_TYPE_STYLE[o.type]}`}>
-                                    {o.type}
-                                  </span>
-                                  <span className="text-xs font-semibold text-gray-800">{o.name}</span>
-                                  {o.region && (
-                                    <span className="text-[10px] text-gray-400">{o.region}</span>
-                                  )}
-                                </div>
-                                <span className="text-xs font-bold text-sage-600 shrink-0">{o.ratio}</span>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+
+                {/* 원두 카드 */}
+                {(selectedMenu.beanBrand || selectedMenu.origins) && (
+                  <div className="bg-gray-50 rounded-xl px-4 py-3.5 mb-3">
+                    <p className="text-xs text-gray-500 font-semibold mb-2">원두</p>
+                    {selectedMenu.beanBrand && (
+                      <p className="text-sm font-bold text-gray-900 mb-2">{selectedMenu.beanBrand}</p>
                     )}
-                    {selectedMenu.cupNotes && (
-                      <div>
-                        <p className="text-xs text-sage-600 font-semibold mb-2">컵 노트</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {selectedMenu.cupNotes.split(',').map((note) => {
-                            const c = getFlavorColor(note);
-                            return (
-                              <span
-                                key={note}
-                                style={{ backgroundColor: c.bg, color: c.text, borderColor: c.border }}
-                                className="text-xs border px-2.5 py-1 rounded-full font-semibold"
-                              >
-                                {note.trim()}
-                              </span>
-                            );
-                          })}
-                        </div>
+                    {selectedMenu.origins && (
+                      <div className="space-y-2">
+                        {selectedMenu.origins.map((o) => (
+                          <div key={o.name} className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                              <span className="text-xs font-semibold text-gray-800">{o.name}</span>
+                              {o.region && (
+                                <span className="text-[10px] text-gray-400">{o.region}</span>
+                              )}
+                            </div>
+                            <span className="text-xs font-bold text-gray-500 shrink-0">{o.ratio}</span>
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>
                 )}
+
+                {selectedMenu.description && (
+                  <p className="text-gray-400 text-sm mb-2 leading-relaxed">{selectedMenu.description}</p>
+                )}
                 {selectedMenu.intro && (
-                  <p className="text-gray-500 text-sm leading-relaxed mt-1">{selectedMenu.intro}</p>
+                  <p className="text-gray-500 text-sm leading-relaxed">{selectedMenu.intro}</p>
                 )}
               </div>
             </div>
 
             {/* 고정 하단 CTA */}
-            <div className="shrink-0 px-5 py-4 border-t border-sage-100 bg-white pb-[calc(1rem+env(safe-area-inset-bottom))]">
+            <div className="shrink-0 px-5 py-4 border-t border-gray-100 bg-white pb-[calc(1rem+env(safe-area-inset-bottom))]">
               {selectedMenu.availableOptions.length > 1 && (
-                <div className="flex rounded-xl overflow-hidden border border-sage-200 mb-3">
+                <div className="flex rounded-xl overflow-hidden border border-gray-200 mb-3">
                   {selectedMenu.availableOptions.map((opt) => (
                     <button
                       key={opt}
@@ -579,7 +549,7 @@ export default function HomePage() {
               )}
 
               <div className="flex items-center gap-3">
-                <div className="flex items-center border-2 border-sage-200 rounded-xl overflow-hidden shrink-0">
+                <div className="flex items-center border-2 border-gray-200 rounded-xl overflow-hidden shrink-0">
                   <button
                     onClick={() => setAddQty((q) => Math.max(q - 1, 1))}
                     disabled={addQty <= 1}
@@ -620,21 +590,21 @@ export default function HomePage() {
 
       {/* 장바구니 드로어 */}
       {isCartOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end">
+        <div className="fixed inset-0 z-50 flex flex-col justify-end lg:items-center lg:justify-center">
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={closeCart}
           />
-          <div ref={cartSheetRef} className="relative bg-white rounded-t-3xl shadow-2xl max-h-[80vh] flex flex-col">
+          <div ref={cartSheetRef} className="relative bg-white rounded-t-3xl lg:rounded-3xl shadow-2xl max-h-[80vh] lg:max-h-[70vh] lg:w-full lg:max-w-md flex flex-col">
             <div
-              className="flex justify-center pt-4 pb-3 touch-none"
+              className="flex justify-center pt-4 pb-3 touch-none lg:hidden"
               onTouchStart={cartDrag.onTouchStart}
               onTouchMove={cartDrag.onTouchMove}
               onTouchEnd={cartDrag.onTouchEnd}
             >
               <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
             </div>
-            <div className="flex items-center justify-between px-5 py-3 border-b border-sage-100">
+            <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
               <h2 className="text-lg font-bold text-sage-900">장바구니</h2>
               <button
                 onClick={closeCart}
@@ -670,8 +640,8 @@ export default function HomePage() {
               )}
             </div>
             {cart.length > 0 && (
-              <div className="px-5 py-4 border-t border-sage-100 bg-sage-50/50">
-                <div className="flex items-center gap-2 bg-white border border-sage-200 rounded-xl px-3 py-2.5 mb-3">
+              <div className="px-5 py-4 border-t border-gray-100 bg-gray-50/50">
+                <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2.5 mb-3">
                   <Clock className="w-4 h-4 text-sage-600 shrink-0" />
                   <span className="text-xs text-sage-700 font-medium">예상 대기</span>
                   <span className="text-xs font-bold text-sage-900 ml-auto">

@@ -11,7 +11,7 @@ export default function InfoPage() {
 
   return (
     <div className="min-h-screen bg-sage-50">
-      <header className="sticky top-0 z-40 bg-white border-b border-sage-100 shadow-sm">
+      <header className="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm">
         <div className="max-w-md mx-auto px-4 h-14 grid grid-cols-[48px_1fr_48px] items-center">
           <button
             onClick={() => router.back()}
@@ -39,9 +39,9 @@ export default function InfoPage() {
       <main className="max-w-md mx-auto px-4 -mt-4 pb-10 flex flex-col gap-3">
 
         {/* 원두 파트너 */}
-        <div className="bg-white rounded-2xl border border-sage-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="px-5 pt-5 pb-4">
-            <p className="text-[11px] text-sage-500 font-semibold uppercase tracking-wider mb-3">원두 파트너</p>
+            <p className="text-[11px] text-gray-400 font-semibold uppercase tracking-wider mb-3">원두 파트너</p>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-center shrink-0">
                 <CoffeeBean size={26} weight="fill" className="text-amber-700" />
@@ -59,7 +59,7 @@ export default function InfoPage() {
                 href="https://www.instagram.com/bean_brothers?igsh=b2w0YnRpbWhxZzVq"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-1.5 bg-sage-50 border border-sage-200 rounded-xl py-2.5 text-xs font-semibold text-sage-700 hover:bg-sage-100 transition-colors"
+                className="flex-1 flex items-center justify-center gap-1.5 bg-gray-50 border border-gray-200 rounded-xl py-2.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 transition-colors"
               >
                 <FaInstagram className="w-3.5 h-3.5" />
                 인스타그램
@@ -68,7 +68,7 @@ export default function InfoPage() {
                 href="https://www.beanbrothers.co.kr/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-1.5 bg-sage-50 border border-sage-200 rounded-xl py-2.5 text-xs font-semibold text-sage-700 hover:bg-sage-100 transition-colors"
+                className="flex-1 flex items-center justify-center gap-1.5 bg-gray-50 border border-gray-200 rounded-xl py-2.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 transition-colors"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
                 홈페이지
@@ -78,11 +78,11 @@ export default function InfoPage() {
         </div>
 
         {/* 부스 위치 */}
-        <div className="bg-white rounded-2xl border border-sage-100 shadow-sm p-5">
-          <p className="text-[11px] text-sage-500 font-semibold uppercase tracking-wider mb-3">부스 위치</p>
+        <div className="bg-white rounded-2xl shadow-sm p-5">
+          <p className="text-[11px] text-gray-400 font-semibold uppercase tracking-wider mb-3">부스 위치</p>
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-sage-100 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
-              <MapPin className="w-5 h-5 text-sage-700" />
+            <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+              <MapPin className="w-5 h-5 text-gray-500" />
             </div>
             <div>
               <p className="font-bold text-gray-900 text-sm">팔정도 00번 부스</p>
@@ -93,14 +93,14 @@ export default function InfoPage() {
         </div>
 
         {/* SNS / 링크 */}
-        <div className="bg-white rounded-2xl border border-sage-100 shadow-sm overflow-hidden">
-          <p className="text-[11px] text-sage-500 font-semibold uppercase tracking-wider px-5 pt-5 pb-3">링크</p>
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <p className="text-[11px] text-gray-400 font-semibold uppercase tracking-wider px-5 pt-5 pb-3">링크</p>
 
           <a
             href="https://www.instagram.com/scc_dgu/"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 transition-colors active:scale-[0.98] border-t border-gray-50"
+            className="flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 transition-colors active:scale-[0.98] border-t border-gray-100"
           >
             <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shrink-0">
               <FaInstagram className="w-5 h-5 text-white" />

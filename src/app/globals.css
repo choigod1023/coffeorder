@@ -5,14 +5,14 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-sage-50: #FFF9F0;
-  --color-sage-100: #eef7f1;
-  --color-sage-200: #d4ecdb;
-  --color-sage-300: #a8d4b4;
-  --color-sage-400: #70AF84;
-  --color-sage-500: #3d9a60;
-  --color-sage-600: #008A44;
-  --color-sage-700: #006e36;
+  --color-sage-50: #F4F6F3;
+  --color-sage-100: #E5EBE3;
+  --color-sage-200: #C8D4C5;
+  --color-sage-300: #9DB29A;
+  --color-sage-400: #728F6F;
+  --color-sage-500: #52704F;
+  --color-sage-600: #3A5538;
+  --color-sage-700: #2B4029;
   --color-sage-800: #39290D;
   --color-sage-900: #211808;
   --color-background: var(--background);
