@@ -14,6 +14,7 @@ export interface MenuItem {
   description?: string;
   category?: string;
   availableOptions: MenuOption[];
+  image?: string;
   beanBrand?: string;
   origins?: BeanOrigin[];
   cupNotes?: string;

@@ -8,6 +8,7 @@ export const MENU: MenuItem[] = [
     description: '항상 입안을 가득 채우는 풍부한 초콜릿 향미',
     category: '커피',
     availableOptions: ['hot', 'ice'],
+    image: '/menu-hangsang.jpg',
     tags: ['초콜릿', '고소한', '달콤한'],
     beanBrand: 'Black Suit',
     origins: [
@@ -25,6 +26,7 @@ export const MENU: MenuItem[] = [
     description: '싱그러운 시트러스 과일, 은은한 꽃 향',
     category: '커피',
     availableOptions: ['hot', 'ice'],
+    image: '/menu-pureun.jpg',
     tags: ['복숭아', '상큼한', '플로럴'],
     beanBrand: 'Velvet White',
     origins: [

@@ -452,16 +452,26 @@ export default function HomePage() {
 
             {/* 스크롤 영역 */}
             <div data-scroll-allow className="overflow-y-auto flex-1">
-              <div className="h-48 bg-gradient-to-br from-sage-600 to-sage-400 flex items-center justify-center">
-                  {selectedMenu.name === '나무' ?
-                  (
+              <div className="h-48 relative overflow-hidden">
+                {selectedMenu.image ? (
+                  <Image
+                    src={selectedMenu.image}
+                    alt={selectedMenu.name}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 512px"
+                    className="object-cover"
+                  />
+                ) : selectedMenu.name === '나무' ? (
+                  <div className="w-full h-full bg-gradient-to-br from-sage-600 to-sage-400 flex items-center justify-center">
                     <div className="relative w-40 h-40">
                       <Image src="/logo.png" alt="상록수커피클럽" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-contain scale-90"/>
                     </div>
-                  ) :
-                  (
+                  </div>
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-sage-600 to-sage-400 flex items-center justify-center">
                     <span className="text-8xl">☕</span>
-                  )}
+                  </div>
+                )}
               </div>
 
               <div className="px-5 py-4 pb-2">

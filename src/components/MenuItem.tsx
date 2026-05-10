@@ -2,6 +2,7 @@
 
 import { MenuItem as MenuItemType } from '@/types';
 import { getFlavorColor } from '@/lib/flavor';
+import Image from 'next/image';
 
 interface MenuItemProps {
   item: MenuItemType;
@@ -17,11 +18,19 @@ export default function MenuItem({ item, cartQty, onPress }: MenuItemProps) {
       onClick={onPress}
       className="w-full text-left rounded-2xl overflow-hidden bg-white shadow-sm active:scale-[0.97] transition-transform"
     >
-      <div className="relative w-full aspect-video bg-gradient-to-br from-sage-600 to-sage-400 flex items-center justify-center">
-        {item.name === '나무' ? (
-          <span className="text-5xl">{emoji}</span>
+      <div className="relative w-full aspect-video">
+        {item.image ? (
+          <Image
+            src={item.image}
+            alt={item.name}
+            fill
+            sizes="(max-width: 768px) 50vw, 33vw"
+            className="object-cover"
+          />
         ) : (
-          <span className="text-5xl">☕</span>
+          <div className="w-full h-full bg-gradient-to-br from-sage-600 to-sage-400 flex items-center justify-center">
+            <span className="text-5xl">{emoji}</span>
+          </div>
         )}
         {cartQty > 0 && (
           <span className="absolute top-2.5 right-2.5 w-7 h-7 bg-sage-800 rounded-full flex items-center justify-center text-white text-xs font-bold">

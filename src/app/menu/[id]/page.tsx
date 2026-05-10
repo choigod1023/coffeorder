@@ -101,8 +101,20 @@ export default function MenuDetailPage({ params }: Props) {
       </header>
 
       {/* Hero */}
-      <div className="w-full h-64 bg-gradient-to-br from-sage-600 to-sage-400 flex items-center justify-center">
-        <span className="text-9xl">{item.category === '논커피' ? '🌿' : '☕'}</span>
+      <div className="w-full h-64 relative overflow-hidden">
+        {item.image ? (
+          <Image
+            src={item.image}
+            alt={item.name}
+            fill
+            sizes="(max-width: 768px) 100vw, 448px"
+            className="object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-sage-600 to-sage-400 flex items-center justify-center">
+            <span className="text-9xl">{item.category === '논커피' ? '🌿' : '☕'}</span>
+          </div>
+        )}
       </div>
 
       {/* Content */}
