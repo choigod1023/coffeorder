@@ -75,19 +75,6 @@ function OrderCard({ order, onCancel }: { order: FirebaseOrder; onCancel: (id: s
     setLoading(true);
     try {
       await updateOrderStatus(order.id, next);
-      const sub = (order as FirebaseOrder & { pushSubscription?: object }).pushSubscription;
-      if (next === 'ready' && sub) {
-        fetch('/api/notify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ subscription: sub, customerName: order.customerName, orderId: order.id }),
-        })
-          .then((r) => r.json())
-          .then((data) => { if (!data.ok) console.error('notify failed:', data); })
-          .catch((err) => console.error('notify fetch error:', err));
-      } else if (next === 'ready' && !sub) {
-        console.warn('no pushSubscription for order', order.id);
-      }
     } finally { setLoading(false); }
   };
 

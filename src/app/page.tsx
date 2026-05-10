@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { CartItem, MenuItem, MenuOption } from '@/types';
 import MenuItemCard from '@/components/MenuItem';
 import CartItemCard from '@/components/CartItem';
-import { ShoppingCart, X, Info, Plus, Minus, Check, Clock, Bell } from 'lucide-react';
+import { ShoppingCart, X, Info, Plus, Minus, Check, Clock } from 'lucide-react';
 import { createOrder, getOrderStatus, subscribeToWaitQueueCount, calcWaitTimeText } from '@/lib/orders';
 import { MENU } from '@/lib/menu';
 import { getCart, saveCart } from '@/lib/cart';
@@ -29,7 +29,6 @@ export default function HomePage() {
   const [showActiveOrders, setShowActiveOrders] = useState(false);
   const [waitQueueCount, setWaitQueueCount] = useState(0);
   const [showA2HS, setShowA2HS] = useState(false);
-  const [showNotifPrompt, setShowNotifPrompt] = useState(false);
 
   // 메뉴 상세 모달 상태
   const [selectedMenu, setSelectedMenu] = useState<MenuItem | null>(null);
@@ -55,29 +54,6 @@ export default function HomePage() {
     const dismissed = sessionStorage.getItem('a2hs_dismissed');
     if (isIOS && !isStandalone && !dismissed) setShowA2HS(true);
   }, []);
-
-  // 푸시 알림 권한이 아직 'default'(미결정)일 때만 동의 모달 표시
-  // granted/denied면 이미 결정된 것이므로 모달 불필요
-  // sessionStorage로 현재 세션에서 '나중에' 누른 경우만 스킵
-  useEffect(() => {
-    if (!('Notification' in window) || !('PushManager' in window)) return;
-    if (Notification.permission !== 'default') return;
-    if (sessionStorage.getItem('notif_dismissed')) return;
-    setShowNotifPrompt(true);
-  }, []);
-
-  const handleNotifAllow = async () => {
-    setShowNotifPrompt(false);
-    const permission = await Notification.requestPermission();
-    if (permission === 'granted' && 'serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(console.error);
-    }
-  };
-
-  const handleNotifDismiss = () => {
-    sessionStorage.setItem('notif_dismissed', '1');
-    setShowNotifPrompt(false);
-  };
 
   useEffect(() => {
     setCart(getCart());
@@ -724,35 +700,6 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* 푸시 알림 동의 모달 */}
-      {showNotifPrompt && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center pb-8 px-4">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={handleNotifDismiss} />
-          <div className="relative bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm">
-            <div className="text-center mb-5">
-              <div className="w-14 h-14 bg-sage-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Bell className="w-7 h-7 text-sage-600" />
-              </div>
-              <h2 className="text-lg font-bold text-gray-900">음료 준비 알림 받기</h2>
-              <p className="text-sm text-gray-500 mt-1">음료가 준비되면 바로 알려드릴게요</p>
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={handleNotifDismiss}
-                className="flex-1 py-4 rounded-xl border-2 border-gray-200 text-gray-500 font-bold text-sm hover:bg-gray-50"
-              >
-                나중에
-              </button>
-              <button
-                onClick={handleNotifAllow}
-                className="flex-1 py-4 rounded-xl bg-sage-600 text-white font-bold text-sm hover:bg-sage-700"
-              >
-                허용하기
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
