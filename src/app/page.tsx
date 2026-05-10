@@ -64,6 +64,19 @@ export default function HomePage() {
     });
   }, []);
 
+  // 모달 열릴 때 배경 스크롤 방지 (non-passive touchmove로 iOS 대응)
+  // data-scroll-allow 속성이 있는 시트 내부 스크롤 영역은 허용
+  useEffect(() => {
+    const isOpen = isCartOpen || !!selectedMenu;
+    if (!isOpen) return;
+    const prevent = (e: TouchEvent) => {
+      if ((e.target as Element).closest('[data-scroll-allow]')) return;
+      e.preventDefault();
+    };
+    document.addEventListener('touchmove', prevent, { passive: false });
+    return () => document.removeEventListener('touchmove', prevent);
+  }, [isCartOpen, selectedMenu]);
+
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const isAtLimit = totalItems >= MAX_ITEMS;
@@ -409,7 +422,7 @@ export default function HomePage() {
             </div>
 
             {/* 스크롤 영역 */}
-            <div className="overflow-y-auto flex-1">
+            <div data-scroll-allow className="overflow-y-auto flex-1">
               <div className="h-48 bg-gradient-to-br from-sage-600 to-sage-400 flex items-center justify-center">
                   {selectedMenu.name === '나무' ?
                   (
@@ -537,7 +550,7 @@ export default function HomePage() {
                 <X className="w-4 h-4 text-gray-500" />
               </button>
             </div>
-            <div className="overflow-y-auto flex-1 px-5 py-3">
+            <div data-scroll-allow className="overflow-y-auto flex-1 px-5 py-3">
               {cart.length === 0 ? (
                 <div className="text-center py-8 text-gray-400">
                   <ShoppingCart className="w-10 h-10 mx-auto mb-2 opacity-30" />
