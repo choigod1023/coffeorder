@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from 'firebase/app';
-import { getFirestore, enableNetwork } from 'firebase/firestore';
+import { getFirestore, initializeFirestore, enableNetwork } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,10 +11,18 @@ const firebaseConfig = {
 };
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-export const db = getFirestore(app);
 
-// iOS PWA는 백그라운드 복귀 시 WebSocket이 끊겨 실시간 수신이 중단됨
-// visibilitychange / online 이벤트에서 Firebase 네트워크를 강제 재연결한다
+// iOS PWA는 WebSocket을 aggressive하게 끊음
+// experimentalForceLongPolling으로 HTTP long-polling 강제 → 훨씬 안정적
+function createDb() {
+  try {
+    return initializeFirestore(app, { experimentalForceLongPolling: true });
+  } catch {
+    return getFirestore(app);
+  }
+}
+export const db = createDb();
+
 if (typeof window !== 'undefined') {
   const reconnect = () => enableNetwork(db).catch(() => null);
   document.addEventListener('visibilitychange', () => {

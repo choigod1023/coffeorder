@@ -76,18 +76,54 @@ export function subscribeToOrder(
   id: string,
   callback: (order: FirebaseOrder) => void,
 ): () => void {
-  return onSnapshot(doc(db, 'orders', id), (snap) => {
-    if (snap.exists()) callback(snap.data() as FirebaseOrder);
-  });
+  let unsub: (() => void) | undefined;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let alive = true;
+
+  function connect() {
+    unsub = onSnapshot(
+      doc(db, 'orders', id),
+      (snap) => { if (snap.exists()) callback(snap.data() as FirebaseOrder); },
+      (err) => {
+        console.error('subscribeToOrder error, retrying:', err);
+        if (alive) timer = setTimeout(connect, 3000);
+      },
+    );
+  }
+  connect();
+
+  return () => {
+    alive = false;
+    clearTimeout(timer);
+    unsub?.();
+  };
 }
 
 export function subscribeToAllOrders(
   callback: (orders: FirebaseOrder[]) => void,
 ): () => void {
+  let unsub: (() => void) | undefined;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let alive = true;
   const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
-  return onSnapshot(q, (snap) => {
-    callback(snap.docs.map((d) => d.data() as FirebaseOrder));
-  });
+
+  function connect() {
+    unsub = onSnapshot(
+      q,
+      (snap) => { callback(snap.docs.map((d) => d.data() as FirebaseOrder)); },
+      (err) => {
+        console.error('subscribeToAllOrders error, retrying:', err);
+        if (alive) timer = setTimeout(connect, 3000);
+      },
+    );
+  }
+  connect();
+
+  return () => {
+    alive = false;
+    clearTimeout(timer);
+    unsub?.();
+  };
 }
 
 export function subscribeToWaitQueueCount(

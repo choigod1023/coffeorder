@@ -211,11 +211,18 @@ export default function TrackPage({ params }: Props) {
         {notifState === 'prompt' && status !== 'picked_up' && status !== 'cancelled' && (
           <button
             onClick={handleEnableNotifications}
-            className="w-full py-3 rounded-xl border-2 border-sage-200 text-sage-700 text-sm font-bold hover:bg-sage-50 transition-colors flex items-center justify-center gap-2"
+            className="w-full py-3 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-sm font-bold transition-colors flex items-center justify-center gap-2"
           >
             <Bell className="w-4 h-4" />
             음료 준비 알림 받기
           </button>
+        )}
+
+        {notifState === 'subscribed' && status !== 'picked_up' && status !== 'cancelled' && (
+          <div className="flex items-center justify-center gap-2 text-sage-600 text-xs font-medium">
+            <Bell className="w-3 h-3" />
+            <span>알림이 설정되었습니다</span>
+          </div>
         )}
 
         {status !== 'picked_up' && status !== 'cancelled' && (
