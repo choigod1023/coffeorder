@@ -62,6 +62,10 @@ export async function cancelOrder(id: string): Promise<void> {
   await updateDoc(doc(db, 'orders', id), { status: 'cancelled' });
 }
 
+export async function savePushSubscription(id: string, subscription: PushSubscription): Promise<void> {
+  await updateDoc(doc(db, 'orders', id), { pushSubscription: subscription.toJSON() });
+}
+
 export async function getOrderStatus(id: string): Promise<OrderStatus | null> {
   const snap = await getDoc(doc(db, 'orders', id));
   if (!snap.exists()) return null;

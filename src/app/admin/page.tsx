@@ -73,8 +73,20 @@ function OrderCard({ order, onCancel }: { order: FirebaseOrder; onCancel: (id: s
 
   const advance = async (next: OrderStatus) => {
     setLoading(true);
-    try { await updateOrderStatus(order.id, next); }
-    finally { setLoading(false); }
+    try {
+      await updateOrderStatus(order.id, next);
+      if (next === 'ready' && (order as FirebaseOrder & { pushSubscription?: object }).pushSubscription) {
+        fetch('/api/notify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            subscription: (order as FirebaseOrder & { pushSubscription?: object }).pushSubscription,
+            customerName: order.customerName,
+            orderId: order.id,
+          }),
+        }).catch(() => {});
+      }
+    } finally { setLoading(false); }
   };
 
   const handleCash = async () => {

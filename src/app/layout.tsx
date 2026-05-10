@@ -15,10 +15,13 @@ export default function RootLayout({
   return (
     <html lang="ko" className="h-full antialiased" suppressHydrationWarning>
       <head>
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
-        />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#577050" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="상록수커피클럽" />
+        <link rel="apple-touch-icon" href="/logo.png" />
       </head>
       <body className="min-h-full bg-sage-50">{children}</body>
       {process.env.NEXT_PUBLIC_GA_ID && (

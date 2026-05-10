@@ -6,7 +6,7 @@ import { Coffee, Bell, X, CheckCircle2, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { OrderStatus } from '@/types';
 import OrderStatusTracker from '@/components/OrderStatus';
-import { subscribeToOrder, cancelOrder, subscribeToWaitQueueCount, calcWaitTimeText, FirebaseOrder } from '@/lib/orders';
+import { subscribeToOrder, cancelOrder, subscribeToWaitQueueCount, calcWaitTimeText, FirebaseOrder, savePushSubscription } from '@/lib/orders';
 import { removeActiveOrder } from '@/lib/activeOrder';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
@@ -69,6 +69,32 @@ export default function TrackPage({ params }: Props) {
     const unsubscribe = subscribeToWaitQueueCount(setWaitQueueCount);
     return unsubscribe;
   }, []);
+
+  // Service Worker 등록 + 푸시 알림 구독
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+    if (!vapidKey) return;
+
+    async function subscribe() {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') return;
+
+      const reg = await navigator.serviceWorker.register('/sw.js');
+      await navigator.serviceWorker.ready;
+
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) {
+        sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: vapidKey,
+        });
+      }
+      await savePushSubscription(id, sub);
+    }
+
+    subscribe().catch(console.error);
+  }, [id]);
 
   const handleCancel = async () => {
     setIsCancelling(true);
