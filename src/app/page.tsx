@@ -438,7 +438,7 @@ export default function HomePage() {
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={closeMenuModal}
           />
-          <div ref={menuSheetRef} className="relative bg-white rounded-t-3xl shadow-2xl max-h-[85vh] flex flex-col">
+          <div ref={menuSheetRef} className="relative bg-white rounded-t-3xl shadow-2xl h-[100dvh] flex flex-col">
             <div
               className="flex justify-center pt-4 pb-3 shrink-0 touch-none"
               onTouchStart={menuDrag.onTouchStart}
