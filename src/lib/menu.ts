@@ -26,7 +26,7 @@ export const MENU: MenuItem[] = [
   {
     id: 'namu',
     name: '나무',
-    price: 4000,
+    price: 3500,
     description: '논커피 메뉴 (아이스 단일)',
     category: '논커피',
     availableOptions: ['ice'],

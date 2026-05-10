@@ -272,7 +272,7 @@ export default function HomePage() {
 
   const handleConfirmOrder = async () => {
     const trimmed = customerName.trim();
-    if (!trimmed) { setNameError('실명을 입력해주세요'); return; }
+    if (!trimmed) { setNameError('입금자명을 입력해주세요'); return; }
     if (trimmed.length > 5) { setNameError('이름은 5자 이하로 입력해주세요'); return; }
     setNameError('');
     setIsOrdering(true);
@@ -306,7 +306,7 @@ export default function HomePage() {
           <div className="flex items-center justify-start w-20"></div>
           <button onClick={() => { window.location.href = '/'; }} className="flex items-center gap-1 justify-self-center shrink-0">
             <Image src="/logo-nav.png" alt="상록수커피클럽" width={40} height={40} className="object-contain" />
-            <h1 className="text-base font-bold text-sage-900 leading-tight">SCC</h1>
+            <h1 className="text-base font-bold text-sage-900 leading-tight">상록수커피클럽</h1>
           </button>
           <div className="flex items-center justify-end gap-1 w-20">
             <button
@@ -455,16 +455,16 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* 메뉴 상세 바텀시트 */}
+      {/* 메뉴 상세 바텀시트 / 데스크탑 센터 모달 */}
       {selectedMenu && (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end">
+        <div className="fixed inset-0 z-50 flex flex-col justify-end lg:items-center lg:justify-center">
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={closeMenuModal}
           />
-          <div ref={menuSheetRef} className="relative bg-white rounded-t-3xl shadow-2xl h-[100dvh] flex flex-col">
+          <div ref={menuSheetRef} className="relative bg-white rounded-t-3xl lg:rounded-3xl shadow-2xl h-[100dvh] lg:h-auto lg:max-h-[85vh] lg:w-full lg:max-w-lg flex flex-col overflow-hidden">
             <div
-              className="flex justify-center pt-4 pb-3 shrink-0 touch-none"
+              className="flex justify-center pt-4 pb-3 shrink-0 touch-none lg:hidden"
               onTouchStart={menuDrag.onTouchStart}
               onTouchMove={menuDrag.onTouchMove}
               onTouchEnd={menuDrag.onTouchEnd}
@@ -498,16 +498,33 @@ export default function HomePage() {
                 {selectedMenu.description && (
                   <p className="text-gray-600 text-sm mb-3 leading-relaxed">{selectedMenu.description}</p>
                 )}
-                {selectedMenu.beanName && (
-                  <div className="bg-sage-50 rounded-xl border border-sage-200 px-4 py-3 mb-2">
-                    <p className="text-xs text-sage-600 font-medium mb-0.5">원두</p>
-                    <p className="text-sm text-gray-800 font-semibold">{selectedMenu.beanName}</p>
-                  </div>
-                )}
-                {selectedMenu.cupNotes && (
-                  <div className="bg-sage-50 rounded-xl border border-sage-200 px-4 py-3 mb-2">
-                    <p className="text-xs text-sage-600 font-medium mb-0.5">컵 노트</p>
-                    <p className="text-sm text-gray-800">{selectedMenu.cupNotes}</p>
+                {(selectedMenu.beanName || selectedMenu.cupNotes) && (
+                  <div className="bg-sage-50 rounded-xl border border-sage-200 px-4 py-3.5 mb-2 space-y-3">
+                    {selectedMenu.beanName && (
+                      <div>
+                        <p className="text-xs text-sage-600 font-medium mb-1.5">원두</p>
+                        <p className="text-sm font-bold text-gray-800">
+                          {selectedMenu.beanName.split(' — ')[0]}
+                        </p>
+                        {selectedMenu.beanName.includes(' — ') && (
+                          <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">
+                            {selectedMenu.beanName.split(' — ')[1]}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    {selectedMenu.cupNotes && (
+                      <div>
+                        <p className="text-xs text-sage-600 font-medium mb-1.5">컵 노트</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {selectedMenu.cupNotes.split(',').map((note) => (
+                            <span key={note} className="text-xs bg-white border border-sage-200 text-sage-700 px-2.5 py-1 rounded-full font-medium">
+                              {note.trim()}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
                 {selectedMenu.intro && (
@@ -619,9 +636,10 @@ export default function HomePage() {
                     />
                   ))}
                   {isAtLimit && (
-                    <p className="text-xs text-orange-600 text-center mt-3 font-medium">
-                      최대 10잔까지 담을 수 있습니다
-                    </p>
+                    <div className="text-center mt-3 space-y-0.5">
+                      <p className="text-xs text-orange-600 font-medium">최대 10잔까지 담을 수 있습니다</p>
+                      <p className="text-xs text-gray-400">단체 주문은 부스 카운터에서 문의해주세요</p>
+                    </div>
                   )}
                 </>
               )}
@@ -665,16 +683,16 @@ export default function HomePage() {
               <div className="mx-auto mb-3 w-14 h-14">
                 <Image src="/logo.png" alt="상록수커피클럽" width={56} height={56} className="rounded-full" />
               </div>
-              <h2 className="text-lg font-bold text-gray-900">실명을 입력해주세요</h2>
-              <p className="text-sm text-gray-500 mt-1">음료 수령 시 실명으로 확인합니다</p>
+              <h2 className="text-lg font-bold text-gray-900">입금자명을 입력해주세요</h2>
+              <p className="text-sm text-gray-500 mt-1">토스 송금 시 입력한 이름과 동일하게 입력해주세요</p>
             </div>
             <input
               type="text"
               value={customerName}
               onChange={(e) => { setCustomerName(e.target.value); setNameError(''); }}
               onKeyDown={(e) => { if (e.key === 'Enter') handleConfirmOrder(); }}
-              placeholder="실명 입력 (최대 5자)"
-              maxLength={5}
+              placeholder="입금자명 입력"
+              maxLength={8}
               autoFocus
               className="w-full border-2 border-sage-200 focus:border-sage-500 rounded-xl px-4 py-4 text-base text-gray-800 placeholder-gray-400 outline-none transition-colors text-center font-semibold"
             />
