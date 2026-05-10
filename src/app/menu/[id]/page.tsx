@@ -117,10 +117,10 @@ export default function MenuDetailPage({ params }: Props) {
         {item.description && (
           <p className="text-gray-600 text-sm mb-4 leading-relaxed">{item.description}</p>
         )}
-        {item.beanName && (
+        {item.beanBrand && (
           <div className="bg-white rounded-xl border border-sage-200 px-4 py-3 mb-3">
             <p className="text-xs text-sage-600 font-medium mb-0.5">원두</p>
-            <p className="text-sm text-gray-800 font-semibold">{item.beanName}</p>
+            <p className="text-sm text-gray-800 font-semibold">{item.beanBrand}</p>
           </div>
         )}
         {item.cupNotes && (

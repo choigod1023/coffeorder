@@ -1,5 +1,12 @@
 export type MenuOption = 'hot' | 'ice';
 
+export interface BeanOrigin {
+  name: string;
+  ratio: string;
+  type: '생산국' | '농장' | '협동조합' | '지역';
+  region?: string;
+}
+
 export interface MenuItem {
   id: string;
   name: string;
@@ -7,7 +14,8 @@ export interface MenuItem {
   description?: string;
   category?: string;
   availableOptions: MenuOption[];
-  beanName?: string;
+  beanBrand?: string;
+  origins?: BeanOrigin[];
   cupNotes?: string;
   intro?: string;
 }
