@@ -1,8 +1,11 @@
 import type { NextConfig } from "next";
+import crypto from "crypto";
 
 const nextConfig: NextConfig = {
-  // Allows the app to be served with `next start`
   output: "standalone",
+  generateBuildId: async () => {
+    return crypto.randomBytes(8).toString("hex");
+  },
 };
 
 export default nextConfig;
