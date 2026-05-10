@@ -44,6 +44,7 @@ export const MENU: MenuItem[] = [
     description: '블루레몬에이드 · 아이스 단일',
     category: '논커피',
     availableOptions: ['ice'],
+    image: '/menu-namu.jpg',
     tags: ['레몬', '청량한', '논커피'],
     intro: '블루큐라소와 레몬의 조합으로 시원하고 청량한 한 잔. 눈도 즐겁고 입도 즐거운 여름 음료입니다.',
   },
