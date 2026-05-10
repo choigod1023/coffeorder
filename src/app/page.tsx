@@ -601,15 +601,15 @@ export default function HomePage() {
               <div className="mx-auto mb-3 w-14 h-14">
                 <Image src="/logo.png" alt="상록수커피클럽" width={56} height={56} className="rounded-full" />
               </div>
-              <h2 className="text-lg font-bold text-gray-900">수령 시 어떻게 불러드릴까요?</h2>
-              <p className="text-sm text-gray-500 mt-1">음료 수령 시 입력하신 닉네임으로 확인합니다</p>
+              <h2 className="text-lg font-bold text-gray-900">실명을 입력해주세요</h2>
+              <p className="text-sm text-gray-500 mt-1">음료 수령 시 실명으로 확인합니다</p>
             </div>
             <input
               type="text"
               value={customerName}
               onChange={(e) => { setCustomerName(e.target.value); setNameError(''); }}
               onKeyDown={(e) => { if (e.key === 'Enter') handleConfirmOrder(); }}
-              placeholder="닉네임 입력 (최대 5자)"
+              placeholder="실명 입력 (최대 5자)"
               maxLength={5}
               autoFocus
               className="w-full border-2 border-sage-200 focus:border-sage-500 rounded-xl px-4 py-4 text-base text-gray-800 placeholder-gray-400 outline-none transition-colors text-center font-semibold"
