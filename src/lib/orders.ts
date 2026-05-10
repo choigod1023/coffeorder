@@ -123,28 +123,44 @@ export function subscribeToAllOrders(
   };
 }
 
+export interface QueueCounts {
+  hangsang: number;
+  pureun: number;
+  namu: number;
+}
+
 export function subscribeToWaitQueueCount(
-  callback: (cups: number) => void,
+  callback: (counts: QueueCounts) => void,
 ): () => void {
   const q = query(collection(db, 'orders'), orderBy('createdAt', 'asc'));
   return onSnapshot(q, (snap) => {
-    const cups = snap.docs
+    const counts: QueueCounts = { hangsang: 0, pureun: 0, namu: 0 };
+    snap.docs
       .filter((d) => {
         const s = d.data().status as OrderStatus;
         return s === 'pending' || s === 'paid' || s === 'preparing';
       })
-      .reduce((total, d) => {
+      .forEach((d) => {
         const items = d.data().items as OrderItem[];
-        return total + items.reduce((s, i) => s + (i.quantity ?? 0), 0);
-      }, 0);
-    callback(cups);
+        items.forEach((item) => {
+          const qty = item.quantity ?? 0;
+          if (item.menuItemId === 'hangsang') counts.hangsang += qty;
+          else if (item.menuItemId === 'pureun') counts.pureun += qty;
+          else if (item.menuItemId === 'namu') counts.namu += qty;
+        });
+      });
+    callback(counts);
   });
 }
 
-export function calcWaitTimeText(queueCups: number, myCartCups = 0): string {
-  const total = queueCups + myCartCups;
-  if (total <= 4)  return '약 3~5분';
-  if (total <= 8)  return '약 6~10분';
-  if (total <= 12) return '약 11~15분';
-  return '약 15~20분';
+// 대기시간 = max(항상잔수, 푸른잔수, ceil(나무잔수/2)) × 3분
+// 항상·푸른: 바리스타 1인이 1잔당 3분 / 나무: 에이드 2잔당 3분
+export function calcWaitTimeText(queue: QueueCounts, cart: QueueCounts = { hangsang: 0, pureun: 0, namu: 0 }): string {
+  const A = queue.hangsang + cart.hangsang;
+  const B = queue.pureun + cart.pureun;
+  const C = queue.namu + cart.namu;
+  const bottleneck = Math.max(A, B, Math.ceil(C / 2));
+  const minutes = bottleneck * 3;
+  if (minutes === 0) return '즉시 준비';
+  return `약 ${minutes}분`;
 }

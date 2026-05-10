@@ -6,7 +6,7 @@ import { Coffee, Bell, X, CheckCircle2, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { OrderStatus } from '@/types';
 import OrderStatusTracker from '@/components/OrderStatus';
-import { subscribeToOrder, cancelOrder, subscribeToWaitQueueCount, calcWaitTimeText, FirebaseOrder } from '@/lib/orders';
+import { subscribeToOrder, cancelOrder, subscribeToWaitQueueCount, calcWaitTimeText, FirebaseOrder, QueueCounts } from '@/lib/orders';
 import { removeActiveOrder } from '@/lib/activeOrder';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
@@ -47,7 +47,7 @@ export default function TrackPage({ params }: Props) {
   const router = useRouter();
   const [order, setOrder] = useState<FirebaseOrder | null>(null);
   const [showReadyBanner, setShowReadyBanner] = useState(false);
-  const [waitQueueCount, setWaitQueueCount] = useState(0);
+  const [waitQueueCounts, setWaitQueueCounts] = useState<QueueCounts>({ hangsang: 0, pureun: 0, namu: 0 });
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
 
@@ -66,7 +66,7 @@ export default function TrackPage({ params }: Props) {
   }, [id, router]);
 
   useEffect(() => {
-    const unsubscribe = subscribeToWaitQueueCount(setWaitQueueCount);
+    const unsubscribe = subscribeToWaitQueueCount(setWaitQueueCounts);
     return unsubscribe;
   }, []);
 
@@ -123,7 +123,7 @@ export default function TrackPage({ params }: Props) {
             <Clock className="w-5 h-5 text-sage-600 flex-shrink-0" />
             <div>
               <p className="text-xs text-sage-700 font-medium">예상 대기 시간</p>
-              <p className="text-base font-bold text-sage-900">{calcWaitTimeText(waitQueueCount)}</p>
+              <p className="text-base font-bold text-sage-900">{calcWaitTimeText(waitQueueCounts)}</p>
             </div>
           </div>
         )}

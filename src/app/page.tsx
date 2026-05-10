@@ -7,7 +7,7 @@ import { getFlavorColor } from '@/lib/flavor';
 import MenuItemCard from '@/components/MenuItem';
 import CartItemCard from '@/components/CartItem';
 import { ShoppingCart, X, Info, Plus, Minus, Check, Clock } from 'lucide-react';
-import { createOrder, getOrderStatus, subscribeToWaitQueueCount, calcWaitTimeText } from '@/lib/orders';
+import { createOrder, getOrderStatus, subscribeToWaitQueueCount, calcWaitTimeText, QueueCounts } from '@/lib/orders';
 import { MENU } from '@/lib/menu';
 import { getCart, saveCart } from '@/lib/cart';
 import { getActiveOrders, addActiveOrder, removeActiveOrder, ActiveOrderInfo } from '@/lib/activeOrder';
@@ -29,7 +29,7 @@ export default function HomePage() {
 
   const [activeOrders, setActiveOrders] = useState<ActiveOrderInfo[]>([]);
   const [showActiveOrders, setShowActiveOrders] = useState(false);
-  const [waitQueueCount, setWaitQueueCount] = useState(0);
+  const [waitQueueCounts, setWaitQueueCounts] = useState<QueueCounts>({ hangsang: 0, pureun: 0, namu: 0 });
   const [showA2HS, setShowA2HS] = useState(false);
 
   // 메뉴 상세 모달 상태
@@ -45,7 +45,7 @@ export default function HomePage() {
   const dragCurrentY = useRef(0);
 
   useEffect(() => {
-    const unsubscribe = subscribeToWaitQueueCount(setWaitQueueCount);
+    const unsubscribe = subscribeToWaitQueueCount(setWaitQueueCounts);
     return unsubscribe;
   }, []);
 
@@ -655,7 +655,11 @@ export default function HomePage() {
                   <Clock className="w-4 h-4 text-sage-600 shrink-0" />
                   <span className="text-xs text-sage-700 font-medium">예상 대기</span>
                   <span className="text-xs font-bold text-sage-900 ml-auto">
-                    {calcWaitTimeText(waitQueueCount, totalItems)}
+                    {calcWaitTimeText(waitQueueCounts, {
+                      hangsang: cart.filter(c => c.menuId === 'hangsang').reduce((s, c) => s + c.quantity, 0),
+                      pureun:   cart.filter(c => c.menuId === 'pureun').reduce((s, c) => s + c.quantity, 0),
+                      namu:     cart.filter(c => c.menuId === 'namu').reduce((s, c) => s + c.quantity, 0),
+                    })}
                   </span>
                 </div>
                 <div className="flex justify-between items-center mb-4">
