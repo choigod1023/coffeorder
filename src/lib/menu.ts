@@ -8,6 +8,7 @@ export const MENU: MenuItem[] = [
     description: '항상 입안을 가득 채우는 풍부한 초콜릿 향미',
     category: '커피',
     availableOptions: ['hot', 'ice'],
+    tags: ['초콜릿', '고소한', '달콤한'],
     beanBrand: 'Black Suit',
     origins: [
       { name: '브라질', ratio: '60%', type: '생산국' },
@@ -24,6 +25,7 @@ export const MENU: MenuItem[] = [
     description: '싱그러운 시트러스 과일, 은은한 꽃 향',
     category: '커피',
     availableOptions: ['hot', 'ice'],
+    tags: ['복숭아', '상큼한', '플로럴'],
     beanBrand: 'Velvet White',
     origins: [
       { name: '비산 디모', ratio: '40%', type: '농장', region: '에티오피아 구지' },
@@ -37,8 +39,10 @@ export const MENU: MenuItem[] = [
     id: 'namu',
     name: '나무',
     price: 3500,
-    description: '논커피 메뉴 (아이스 단일)',
+    description: '블루레몬에이드 · 아이스 단일',
     category: '논커피',
     availableOptions: ['ice'],
+    tags: ['레몬', '청량한', '논커피'],
+    intro: '블루큐라소와 레몬의 조합으로 시원하고 청량한 한 잔. 눈도 즐겁고 입도 즐거운 여름 음료입니다.',
   },
 ];
