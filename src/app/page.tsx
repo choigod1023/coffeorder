@@ -28,6 +28,7 @@ export default function HomePage() {
   const [activeOrders, setActiveOrders] = useState<ActiveOrderInfo[]>([]);
   const [showActiveOrders, setShowActiveOrders] = useState(false);
   const [waitQueueCount, setWaitQueueCount] = useState(0);
+  const [showA2HS, setShowA2HS] = useState(false);
 
   // 메뉴 상세 모달 상태
   const [selectedMenu, setSelectedMenu] = useState<MenuItem | null>(null);
@@ -44,6 +45,14 @@ export default function HomePage() {
   useEffect(() => {
     const unsubscribe = subscribeToWaitQueueCount(setWaitQueueCount);
     return unsubscribe;
+  }, []);
+
+  // iOS Safari이고 standalone(홈 화면 앱)이 아닐 때 홈 화면 추가 배너 표시
+  useEffect(() => {
+    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    const isStandalone = ('standalone' in navigator) && (navigator as Navigator & { standalone?: boolean }).standalone;
+    const dismissed = sessionStorage.getItem('a2hs_dismissed');
+    if (isIOS && !isStandalone && !dismissed) setShowA2HS(true);
   }, []);
 
   useEffect(() => {
@@ -300,6 +309,24 @@ export default function HomePage() {
 
       {/* Main */}
       <main className="max-w-md mx-auto px-4 pb-24">
+        {/* iOS 홈 화면 추가 안내 배너 */}
+        {showA2HS && (
+          <div className="mt-3 bg-sage-700 text-white rounded-2xl px-4 py-3 flex items-start gap-3">
+            <span className="text-xl shrink-0 mt-0.5">📲</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold">홈 화면에 추가하면 알림을 받을 수 있어요</p>
+              <p className="text-xs text-sage-200 mt-0.5">Safari 하단 공유 버튼 → <span className="font-semibold text-white">홈 화면에 추가</span></p>
+            </div>
+            <button
+              onClick={() => { sessionStorage.setItem('a2hs_dismissed', '1'); setShowA2HS(false); }}
+              className="shrink-0 text-sage-300 hover:text-white p-1 -mr-1"
+              aria-label="닫기"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
         {/* 진행 중인 주문 배너 */}
         {activeOrders.length === 1 && (
           <Link
