@@ -56,16 +56,17 @@ export default function HomePage() {
     if (isIOS && !isStandalone && !dismissed) setShowA2HS(true);
   }, []);
 
-  // 푸시 알림 권한 미설정 시 첫 실행에서 동의 모달 표시
+  // 푸시 알림 권한이 아직 'default'(미결정)일 때만 동의 모달 표시
+  // granted/denied면 이미 결정된 것이므로 모달 불필요
+  // sessionStorage로 현재 세션에서 '나중에' 누른 경우만 스킵
   useEffect(() => {
     if (!('Notification' in window) || !('PushManager' in window)) return;
     if (Notification.permission !== 'default') return;
-    if (localStorage.getItem('notif_prompted')) return;
+    if (sessionStorage.getItem('notif_dismissed')) return;
     setShowNotifPrompt(true);
   }, []);
 
   const handleNotifAllow = async () => {
-    localStorage.setItem('notif_prompted', '1');
     setShowNotifPrompt(false);
     const permission = await Notification.requestPermission();
     if (permission === 'granted' && 'serviceWorker' in navigator) {
@@ -74,7 +75,7 @@ export default function HomePage() {
   };
 
   const handleNotifDismiss = () => {
-    localStorage.setItem('notif_prompted', '1');
+    sessionStorage.setItem('notif_dismissed', '1');
     setShowNotifPrompt(false);
   };
 
