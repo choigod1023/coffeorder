@@ -42,6 +42,15 @@ function StatusIcon({ status }: { status: OrderStatus }) {
   return <Coffee className="w-6 h-6 text-sage-600" />;
 }
 
+type PushState = 'idle' | 'subscribed' | 'denied' | 'unsupported';
+
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  return new Uint8Array([...rawData].map((c) => c.charCodeAt(0)));
+}
+
 export default function TrackPage({ params }: Props) {
   const { id } = use(params);
   const router = useRouter();
@@ -50,6 +59,7 @@ export default function TrackPage({ params }: Props) {
   const [waitQueueCount, setWaitQueueCount] = useState(0);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [pushState, setPushState] = useState<PushState>('idle');
 
   useEffect(() => {
     const unsubscribe = subscribeToOrder(id, (o) => {
@@ -70,31 +80,49 @@ export default function TrackPage({ params }: Props) {
     return unsubscribe;
   }, []);
 
-  // Service Worker 등록 + 푸시 알림 구독
+  // SW 등록 + 기존 구독 여부 확인 (권한 요청 없이)
   useEffect(() => {
-    if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+      setPushState('unsupported');
+      return;
+    }
+    async function checkExisting() {
+      try {
+        const reg = await navigator.serviceWorker.register('/sw.js');
+        await navigator.serviceWorker.ready;
+        const sub = await reg.pushManager.getSubscription();
+        if (sub) {
+          await savePushSubscription(id, sub);
+          setPushState('subscribed');
+        } else if (Notification.permission === 'denied') {
+          setPushState('denied');
+        }
+      } catch { /* unsupported */ }
+    }
+    checkExisting();
+  }, [id]);
+
+  // iOS에서는 반드시 유저 탭에서 호출해야 알림 권한이 뜸
+  const handleEnableNotifications = async () => {
     const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
     if (!vapidKey) return;
-
-    async function subscribe() {
+    try {
       const permission = await Notification.requestPermission();
-      if (permission !== 'granted') return;
-
-      const reg = await navigator.serviceWorker.register('/sw.js');
-      await navigator.serviceWorker.ready;
-
+      if (permission !== 'granted') { setPushState('denied'); return; }
+      const reg = await navigator.serviceWorker.ready;
       let sub = await reg.pushManager.getSubscription();
       if (!sub) {
         sub = await reg.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: vapidKey,
+          applicationServerKey: urlBase64ToUint8Array(vapidKey),
         });
       }
       await savePushSubscription(id, sub);
+      setPushState('subscribed');
+    } catch (err) {
+      console.error('push subscribe error', err);
     }
-
-    subscribe().catch(console.error);
-  }, [id]);
+  };
 
   const handleCancel = async () => {
     setIsCancelling(true);
@@ -179,6 +207,23 @@ export default function TrackPage({ params }: Props) {
           >
             주문 취소 요청
           </button>
+        )}
+
+        {pushState === 'idle' && status !== 'picked_up' && status !== 'cancelled' && (
+          <button
+            onClick={handleEnableNotifications}
+            className="w-full py-3 rounded-xl border-2 border-sage-200 text-sage-700 text-sm font-medium hover:bg-sage-50 transition-colors flex items-center justify-center gap-2"
+          >
+            <Bell className="w-4 h-4" />
+            음료 준비 알림 받기
+          </button>
+        )}
+
+        {pushState === 'subscribed' && status !== 'picked_up' && status !== 'cancelled' && (
+          <div className="flex items-center justify-center gap-2 text-sage-600 text-xs">
+            <Bell className="w-3 h-3" />
+            <span>음료 준비 시 알림을 보내드립니다</span>
+          </div>
         )}
 
         {status !== 'picked_up' && status !== 'cancelled' && (

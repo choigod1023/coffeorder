@@ -280,10 +280,10 @@ export default function HomePage() {
       <header className="sticky top-0 z-40 bg-white border-b border-sage-100 shadow-sm">
         <div className="max-w-md mx-auto px-4 h-14 grid grid-cols-[80px_1fr_80px] items-center">
           <div className="flex items-center justify-start w-20"></div>
-          <Link href="/" className="flex items-center gap-1 justify-self-center shrink-0">
+          <button onClick={() => { window.location.href = '/'; }} className="flex items-center gap-1 justify-self-center shrink-0">
             <Image src="/logo-nav.png" alt="상록수커피클럽" width={40} height={40} className="object-contain" />
             <h1 className="text-base font-bold text-sage-900 leading-tight">SCC</h1>
-          </Link>
+          </button>
           <div className="flex items-center justify-end gap-1 w-20">
             <button
               onClick={() => router.push('/info')}
@@ -631,7 +631,7 @@ export default function HomePage() {
 
       {/* 실명 입력 모달 */}
       {showNameModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 px-4">
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => { if (!isOrdering) setShowNameModal(false); }}
