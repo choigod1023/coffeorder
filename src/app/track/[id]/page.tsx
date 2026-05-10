@@ -50,6 +50,7 @@ export default function TrackPage({ params }: Props) {
   const [waitQueueCount, setWaitQueueCount] = useState(0);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [notifState, setNotifState] = useState<'idle' | 'subscribed' | 'prompt'>('idle');
 
   useEffect(() => {
     const unsubscribe = subscribeToOrder(id, (o) => {
@@ -70,30 +71,55 @@ export default function TrackPage({ params }: Props) {
     return unsubscribe;
   }, []);
 
-  // 권한이 이미 granted면 자동 구독 (홈 페이지에서 이미 허용한 경우)
   useEffect(() => {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-    if (Notification.permission !== 'granted') return;
     const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
     if (!vapidKey) return;
+
+    const perm = Notification.permission;
+    if (perm === 'denied') return;
+
+    if (perm === 'default') {
+      setNotifState('prompt');
+      return;
+    }
+
+    // granted → 자동 구독
     async function autoSubscribe() {
       try {
         const reg = await navigator.serviceWorker.register('/sw.js');
         await navigator.serviceWorker.ready;
         let sub = await reg.pushManager.getSubscription();
         if (!sub) {
-          sub = await reg.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: vapidKey,
-          });
+          sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: vapidKey });
         }
         await savePushSubscription(id, sub);
+        setNotifState('subscribed');
       } catch (err) {
         console.error('push subscribe error', err);
       }
     }
     autoSubscribe();
   }, [id]);
+
+  const handleEnableNotifications = async () => {
+    const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+    if (!vapidKey) return;
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') { setNotifState('idle'); return; }
+    try {
+      const reg = await navigator.serviceWorker.register('/sw.js');
+      await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) {
+        sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: vapidKey });
+      }
+      await savePushSubscription(id, sub);
+      setNotifState('subscribed');
+    } catch (err) {
+      console.error('push subscribe error', err);
+    }
+  };
 
   const handleCancel = async () => {
     setIsCancelling(true);
@@ -181,6 +207,16 @@ export default function TrackPage({ params }: Props) {
         )}
 
 
+
+        {notifState === 'prompt' && status !== 'picked_up' && status !== 'cancelled' && (
+          <button
+            onClick={handleEnableNotifications}
+            className="w-full py-3 rounded-xl border-2 border-sage-200 text-sage-700 text-sm font-bold hover:bg-sage-50 transition-colors flex items-center justify-center gap-2"
+          >
+            <Bell className="w-4 h-4" />
+            음료 준비 알림 받기
+          </button>
+        )}
 
         {status !== 'picked_up' && status !== 'cancelled' && (
           <div className="flex items-center justify-center gap-2 text-gray-400 text-xs">
