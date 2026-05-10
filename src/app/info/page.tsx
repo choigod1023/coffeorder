@@ -18,7 +18,10 @@ export default function InfoPage() {
           >
             <ArrowLeft className="w-5 h-5 text-gray-600" />
           </button>
-          <span className="text-center text-base font-bold text-sage-900">상록수커피클럽</span>
+          <div className="flex items-center justify-center gap-2">
+            <Image src="/logo-nav.png" alt="상록수커피클럽" width={32} height={32} className="object-contain" />
+            <span className="text-base font-bold text-sage-900">상록수커피클럽</span>
+          </div>
           <div />
         </div>
       </header>
@@ -29,7 +32,7 @@ export default function InfoPage() {
           <Image src="/logo.png" alt="상록수커피클럽" width={60} height={60} className="rounded-full" />
         </div>
         <h1 className="text-xl font-bold tracking-tight mb-1">상록수커피클럽</h1>
-        <p className="text-sage-100 text-sm font-medium">동국대학교 봄 축제 · 2025</p>
+        <p className="text-sage-100 text-sm font-medium">동국대학교 봄 축제 · 2026</p>
         <p className="text-sage-200 text-xs mt-2 leading-relaxed">
           좋은 원두, 정성스러운 한 잔<br />당신의 축제를 더 특별하게
         </p>
@@ -129,7 +132,7 @@ export default function InfoPage() {
         </div>
 
         <p className="text-center text-xs text-gray-300 py-2">
-          상록수커피클럽 · 2025 동국대 봄 축제
+          상록수커피클럽 · 2026 동국대 봄 축제
         </p>
       </main>
     </div>
