@@ -1,26 +1,22 @@
 const KEY = 'scc_active_orders';
-const EXPIRY_MS = 6 * 60 * 60 * 1000; // 6시간
+export const EXPIRY_MS = 30 * 60 * 1000; // 30분
 
 export interface ActiveOrderInfo {
   orderId: string;
   total: number;
   name: string;
-  createdAt: string; // ISO string
+  createdAt: string;
 }
 
-function isExpired(order: ActiveOrderInfo): boolean {
-  if (!order.createdAt) return true; // createdAt 없는 구버전 항목은 만료 처리
+export function isOrderExpired(order: ActiveOrderInfo): boolean {
+  if (!order.createdAt) return true;
   return Date.now() - new Date(order.createdAt).getTime() > EXPIRY_MS;
 }
 
 function load(): ActiveOrderInfo[] {
   if (typeof window === 'undefined') return [];
   try {
-    const all = JSON.parse(localStorage.getItem(KEY) ?? '[]') as ActiveOrderInfo[];
-    const fresh = all.filter((o) => !isExpired(o));
-    // 만료된 항목이 있으면 즉시 정리
-    if (fresh.length !== all.length) localStorage.setItem(KEY, JSON.stringify(fresh));
-    return fresh;
+    return JSON.parse(localStorage.getItem(KEY) ?? '[]') as ActiveOrderInfo[];
   } catch {
     return [];
   }
@@ -36,8 +32,13 @@ export function addActiveOrder(info: Omit<ActiveOrderInfo, 'createdAt'>): void {
   save([...orders, { ...info, createdAt: new Date().toISOString() }]);
 }
 
-export function getActiveOrders(): ActiveOrderInfo[] {
-  return load();
+// fresh / expired 분리해서 반환
+export function getActiveOrders(): { fresh: ActiveOrderInfo[]; expired: ActiveOrderInfo[] } {
+  const all = load();
+  return {
+    fresh: all.filter((o) => !isOrderExpired(o)),
+    expired: all.filter((o) => isOrderExpired(o)),
+  };
 }
 
 export function removeActiveOrder(orderId: string): void {

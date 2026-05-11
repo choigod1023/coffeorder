@@ -28,6 +28,7 @@ export default function HomePage() {
   const [nameError, setNameError] = useState('');
 
   const [activeOrders, setActiveOrders] = useState<ActiveOrderInfo[]>([]);
+  const [expiredOrders, setExpiredOrders] = useState<ActiveOrderInfo[]>([]);
   const [showActiveOrders, setShowActiveOrders] = useState(false);
   const [waitQueueCounts, setWaitQueueCounts] = useState<QueueCounts>({ hangsang: 0, pureun: 0, namu: 0 });
   const [showA2HS, setShowA2HS] = useState(false);
@@ -59,10 +60,11 @@ export default function HomePage() {
 
   useEffect(() => {
     setCart(getCart());
-    const stored = getActiveOrders();
-    if (stored.length === 0) return;
+    const { fresh, expired } = getActiveOrders();
+    setExpiredOrders(expired);
+    if (fresh.length === 0) return;
     Promise.all(
-      stored.map(async (o) => {
+      fresh.map(async (o) => {
         const status = await getOrderStatus(o.orderId);
         if (!status || status === 'picked_up' || status === 'cancelled') {
           removeActiveOrder(o.orderId);
@@ -383,6 +385,26 @@ export default function HomePage() {
             )}
           </div>
         )}
+
+        {/* 만료된 주문 안내 */}
+        {expiredOrders.map((o) => (
+          <div key={o.orderId} className="mt-3 bg-red-50 border border-red-200 rounded-2xl px-4 py-3.5 flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-red-700">주문이 만료되었습니다</p>
+              <p className="text-xs text-red-500 mt-0.5">{o.name}님 · {o.total.toLocaleString('ko-KR')}원 · {o.orderId}</p>
+              <p className="text-xs text-red-400 mt-1">주문 후 30분이 지났습니다. 원하시면 다시 주문해주세요.</p>
+            </div>
+            <button
+              onClick={() => {
+                removeActiveOrder(o.orderId);
+                setExpiredOrders((prev) => prev.filter((e) => e.orderId !== o.orderId));
+              }}
+              className="shrink-0 p-1 text-red-300 hover:text-red-500 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        ))}
 
         {/* Hero */}
         <div className="mt-3 mb-3 rounded-2xl bg-gradient-to-r from-sage-700 to-sage-600 p-4 text-white flex items-center gap-4">

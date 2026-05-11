@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { OrderStatus } from '@/types';
 import OrderStatusTracker from '@/components/OrderStatus';
 import { subscribeToOrder, cancelOrder, subscribeToWaitQueueCount, calcWaitTimeText, FirebaseOrder, QueueCounts } from '@/lib/orders';
-import { removeActiveOrder } from '@/lib/activeOrder';
+import { removeActiveOrder, EXPIRY_MS } from '@/lib/activeOrder';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 
@@ -47,6 +47,7 @@ export default function TrackPage({ params }: Props) {
   const router = useRouter();
   const [order, setOrder] = useState<FirebaseOrder | null>(null);
   const [showReadyBanner, setShowReadyBanner] = useState(false);
+  const [isExpired, setIsExpired] = useState(false);
   const [waitQueueCounts, setWaitQueueCounts] = useState<QueueCounts>({ hangsang: 0, pureun: 0, namu: 0 });
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
@@ -54,6 +55,13 @@ export default function TrackPage({ params }: Props) {
   useEffect(() => {
     const unsubscribe = subscribeToOrder(id, (o) => {
       setOrder(o);
+      // pending/paid 상태에서 30분 초과 시 만료 처리
+      if ((o.status === 'pending' || o.status === 'paid') && o.createdAt) {
+        if (Date.now() - new Date(o.createdAt).getTime() > EXPIRY_MS) {
+          setIsExpired(true);
+          removeActiveOrder(id);
+        }
+      }
       if (o.status === 'ready') setShowReadyBanner(true);
       if (o.status === 'picked_up' || o.status === 'cancelled') {
         removeActiveOrder(id);
@@ -98,6 +106,23 @@ export default function TrackPage({ params }: Props) {
       </header>
 
       <main className="flex-1 max-w-md mx-auto w-full px-4 py-3 flex flex-col gap-3">
+        {isExpired && (
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start gap-3">
+            <X className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-bold text-red-700 text-base">주문이 만료되었습니다</p>
+              <p className="text-red-500 text-sm mt-0.5">주문 후 30분이 지나 만료되었습니다.</p>
+              <p className="text-red-400 text-sm">원하시면 처음부터 다시 주문해주세요.</p>
+              <Link
+                href="/"
+                className="mt-3 inline-flex items-center justify-center w-full bg-red-500 hover:bg-red-600 text-white text-sm font-bold rounded-xl py-2.5 transition-colors"
+              >
+                다시 주문하기
+              </Link>
+            </div>
+          </div>
+        )}
+
         {showReadyBanner && (
           <div className="bg-green-500 text-white rounded-2xl p-4 flex items-center gap-3 shadow-lg animate-in slide-in-from-top-4 duration-500">
             <Bell className="w-6 h-6 flex-shrink-0 animate-bounce" />

@@ -129,7 +129,7 @@ export interface QueueCounts {
   namu: number;
 }
 
-const QUEUE_EXPIRY_MS = 6 * 60 * 60 * 1000; // 6시간 이상 된 주문은 대기 큐에서 제외
+const QUEUE_EXPIRY_MS = 30 * 60 * 1000; // 30분 이상 된 주문은 대기 큐에서 제외
 
 export function subscribeToWaitQueueCount(
   callback: (counts: QueueCounts) => void,
