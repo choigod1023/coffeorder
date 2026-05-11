@@ -11,6 +11,11 @@ import {
   orderBy,
 } from 'firebase/firestore';
 import { OrderItem, OrderStatus } from '@/types';
+import { MENU } from './menu';
+
+const VALID_OPTIONS = new Set(['hot', 'ice']);
+const MAX_TOTAL_QTY = 10;
+const MAX_QTY_PER_ITEM = 10;
 
 export interface FirebaseOrder {
   id: string;
@@ -36,13 +41,36 @@ async function generateOrderId(): Promise<string> {
 export async function createOrder(
   customerName: string,
   items: OrderItem[],
-  totalPrice: number,
+  _totalPrice: number,
 ): Promise<string> {
+  const menuMap = new Map(MENU.map((m) => [m.id, m]));
+
+  const sanitized = items
+    .filter((item) => menuMap.has(item.menuItemId) && VALID_OPTIONS.has(item.option))
+    .map((item) => {
+      const def = menuMap.get(item.menuItemId)!;
+      const qty = Math.min(Math.max(Math.trunc(Number(item.quantity)), 1), MAX_QTY_PER_ITEM);
+      return {
+        menuItemId: item.menuItemId,
+        name: def.name + (item.option === 'hot' ? ' (핫)' : ' (아이스)'),
+        price: def.price,
+        quantity: qty,
+        option: item.option,
+      };
+    });
+
+  if (sanitized.length === 0) throw new Error('유효한 주문 항목이 없습니다');
+
+  const totalQty = sanitized.reduce((s, i) => s + i.quantity, 0);
+  if (totalQty > MAX_TOTAL_QTY) throw new Error('최대 주문 수량(10잔)을 초과했습니다');
+
+  const totalPrice = sanitized.reduce((s, i) => s + i.price * i.quantity, 0);
+
   const id = await generateOrderId();
   await setDoc(doc(db, 'orders', id), {
     id,
     customerName,
-    items,
+    items: sanitized,
     totalPrice,
     status: 'pending',
     createdAt: new Date().toISOString(),
@@ -169,5 +197,5 @@ export function calcWaitTimeText(queue: QueueCounts, cart: QueueCounts = { hangs
   const bottleneck = Math.max(A, B, Math.ceil(C / 2));
   const minutes = bottleneck * 3;
   if (minutes === 0) return '즉시 준비';
-  return `약 ${minutes}분`;
+  return `약 ${minutes}~${minutes + 3}분`;
 }

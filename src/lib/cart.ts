@@ -5,7 +5,11 @@ const CART_KEY = 'scc_cart';
 export function getCart(): CartItem[] {
   if (typeof window === 'undefined') return [];
   try {
-    return JSON.parse(localStorage.getItem(CART_KEY) ?? '[]') as CartItem[];
+    const raw = JSON.parse(localStorage.getItem(CART_KEY) ?? '[]') as CartItem[];
+    return raw.map((item) => ({
+      ...item,
+      quantity: Math.min(Math.max(Math.trunc(Number(item.quantity) || 1), 1), 10),
+    }));
   } catch {
     return [];
   }
