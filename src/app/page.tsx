@@ -264,7 +264,7 @@ export default function HomePage() {
       }));
       const orderId = await createOrder(trimmed, items, totalPrice);
       addActiveOrder({ orderId, total: totalPrice, name: trimmed });
-      setActiveOrders((prev) => [...prev, { orderId, total: totalPrice, name: trimmed }]);
+      setActiveOrders((prev) => [...prev, { orderId, total: totalPrice, name: trimmed, createdAt: new Date().toISOString() }]);
       setShowNameModal(false);
       updateCart([]);
       router.push(`/order/${orderId}?total=${totalPrice}&name=${encodeURIComponent(trimmed)}`);

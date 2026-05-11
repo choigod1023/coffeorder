@@ -129,16 +129,23 @@ export interface QueueCounts {
   namu: number;
 }
 
+const QUEUE_EXPIRY_MS = 6 * 60 * 60 * 1000; // 6시간 이상 된 주문은 대기 큐에서 제외
+
 export function subscribeToWaitQueueCount(
   callback: (counts: QueueCounts) => void,
 ): () => void {
   const q = query(collection(db, 'orders'), orderBy('createdAt', 'asc'));
   return onSnapshot(q, (snap) => {
     const counts: QueueCounts = { hangsang: 0, pureun: 0, namu: 0 };
+    const cutoff = Date.now() - QUEUE_EXPIRY_MS;
     snap.docs
       .filter((d) => {
-        const s = d.data().status as OrderStatus;
-        return s === 'pending' || s === 'paid' || s === 'preparing';
+        const data = d.data();
+        const s = data.status as OrderStatus;
+        const fresh = data.createdAt
+          ? new Date(data.createdAt).getTime() > cutoff
+          : false;
+        return fresh && (s === 'pending' || s === 'paid' || s === 'preparing');
       })
       .forEach((d) => {
         const items = d.data().items as OrderItem[];
