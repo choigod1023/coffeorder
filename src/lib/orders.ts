@@ -25,6 +25,7 @@ export interface FirebaseOrder {
   status: OrderStatus;
   paymentMethod?: 'toss' | 'cash';
   createdAt: string;
+  paidAt?: string;
 }
 
 async function generateOrderId(): Promise<string> {
@@ -79,11 +80,17 @@ export async function createOrder(
 }
 
 export async function updateOrderStatus(id: string, status: OrderStatus): Promise<void> {
-  await updateDoc(doc(db, 'orders', id), { status });
+  const updates: Record<string, unknown> = { status };
+  if (status === 'paid') updates.paidAt = new Date().toISOString();
+  await updateDoc(doc(db, 'orders', id), updates);
 }
 
 export async function confirmCashPayment(id: string): Promise<void> {
-  await updateDoc(doc(db, 'orders', id), { status: 'paid', paymentMethod: 'cash' });
+  await updateDoc(doc(db, 'orders', id), {
+    status: 'paid',
+    paymentMethod: 'cash',
+    paidAt: new Date().toISOString(),
+  });
 }
 
 export async function cancelOrder(id: string): Promise<void> {
@@ -130,7 +137,7 @@ export function subscribeToAllOrders(
   let unsub: (() => void) | undefined;
   let timer: ReturnType<typeof setTimeout> | undefined;
   let alive = true;
-  const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
+  const q = query(collection(db, 'orders'), orderBy('createdAt', 'asc'));
 
   function connect() {
     unsub = onSnapshot(
@@ -198,4 +205,8 @@ export function calcWaitTimeText(queue: QueueCounts, cart: QueueCounts = { hangs
   const minutes = bottleneck * 3;
   if (minutes === 0) return '즉시 준비';
   return `약 ${minutes}~${minutes + 3}분`;
+}
+
+export function getQueueCupTotal(queue: QueueCounts, cart: QueueCounts = { hangsang: 0, pureun: 0, namu: 0 }): number {
+  return (queue.hangsang + cart.hangsang) + (queue.pureun + cart.pureun) + (queue.namu + cart.namu);
 }

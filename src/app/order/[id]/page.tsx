@@ -89,15 +89,17 @@ export default function OrderPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-sage-50 flex flex-col">
       <header className="bg-white border-b border-sage-100 shadow-sm">
-        <div className="max-w-md mx-auto px-4 h-14 flex items-center gap-2">
-          <Link href="/" className="flex items-center gap-2">
+        <div className="max-w-md mx-auto px-4 h-14 grid grid-cols-[80px_1fr_80px] items-center">
+          <div />
+          <Link href="/" className="flex items-center justify-center gap-1.5">
             <Image src="/logo-nav.png" alt="상록수커피클럽" width={40} height={40} className="object-contain" />
-            <h1 className="text-base font-bold text-sage-900">결제</h1>
+            <h1 className="text-base font-bold text-sage-900">상록수커피클럽</h1>
           </Link>
+          <div />
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-center px-5 py-4 max-w-md mx-auto w-full gap-3">
+      <main className="flex-1 flex flex-col items-center px-5 py-4 max-w-md mx-auto w-full gap-3 justify-center">
         {isPaid ? (
           <div className="text-center animate-in fade-in-0 zoom-in-95 duration-300">
             <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">

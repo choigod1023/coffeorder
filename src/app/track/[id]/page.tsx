@@ -51,6 +51,7 @@ export default function TrackPage({ params }: Props) {
   const [waitQueueCounts, setWaitQueueCounts] = useState<QueueCounts>({ hangsang: 0, pureun: 0, namu: 0 });
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [cancelledLocally, setCancelledLocally] = useState(false);
 
   useEffect(() => {
     const unsubscribe = subscribeToOrder(id, (o) => {
@@ -84,6 +85,8 @@ export default function TrackPage({ params }: Props) {
     try {
       await cancelOrder(id);
       setShowCancelModal(false);
+      setCancelledLocally(true);
+      removeActiveOrder(id);
     } catch {
       alert('취소 중 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
@@ -111,7 +114,7 @@ export default function TrackPage({ params }: Props) {
             <X className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
               <p className="font-bold text-red-700 text-base">주문이 만료되었습니다</p>
-              <p className="text-red-500 text-sm mt-0.5">주문 후 30분이 지나 만료되었습니다.</p>
+              <p className="text-red-500 text-sm mt-0.5">주문 후 10분이 지나 만료되었습니다.</p>
               <p className="text-red-400 text-sm">원하시면 처음부터 다시 주문해주세요.</p>
               <Link
                 href="/"
@@ -119,6 +122,16 @@ export default function TrackPage({ params }: Props) {
               >
                 다시 주문하기
               </Link>
+            </div>
+          </div>
+        )}
+
+        {cancelledLocally && (
+          <div className="bg-red-500 text-white rounded-2xl p-4 flex items-center gap-3 shadow-lg animate-in slide-in-from-top-4 duration-300">
+            <X className="w-6 h-6 flex-shrink-0" />
+            <div>
+              <p className="font-bold text-base">주문이 취소되었습니다</p>
+              <p className="text-red-100 text-sm">환불은 스태프가 직접 처리해드립니다</p>
             </div>
           </div>
         )}

@@ -35,7 +35,7 @@ const MENU_COLUMNS = [
 
 function exportToCSV(orders: FirebaseOrder[]) {
   const headers = [
-    '주문번호', '고객이름', '주문시간',
+    '주문번호', '고객이름', '주문시간', '입금시간',
     ...MENU_COLUMNS.map((c) => c.label),
     '합계금액', '결제방식', '상태',
   ];
@@ -50,6 +50,7 @@ function exportToCSV(orders: FirebaseOrder[]) {
       o.id,
       o.customerName || '-',
       new Date(o.createdAt).toLocaleString('ko-KR'),
+      o.paidAt ? new Date(o.paidAt).toLocaleString('ko-KR') : '-',
       ...qtys,
       o.totalPrice,
       o.paymentMethod === 'cash' ? '현금' : '토스',
@@ -284,7 +285,9 @@ export default function AdminPage() {
   const pending = orders.filter((o) => o.status === 'pending');
   const active = orders.filter((o) => o.status === 'paid' || o.status === 'preparing');
   const ready = orders.filter((o) => o.status === 'ready');
-  const done = orders.filter((o) => o.status === 'picked_up' || o.status === 'cancelled');
+  const completed = orders.filter((o) => o.status === 'picked_up');
+  const cancelled = orders.filter((o) => o.status === 'cancelled');
+  const done = [...completed, ...cancelled];
   const totalActive = pending.length + active.length + ready.length;
 
   const completedOrders = orders.filter((o) => o.status === 'picked_up');
@@ -415,14 +418,36 @@ export default function AdminPage() {
             onClick={() => setShowDone((v) => !v)}
             className="w-full flex items-center justify-between px-4 lg:px-6 py-3 text-sm text-gray-500 hover:bg-gray-50 transition-colors"
           >
-            <span className="font-medium">완료·취소 {done.length}건</span>
+            <span className="font-medium flex items-center gap-3">
+              수령완료 {completed.length}건
+              {cancelled.length > 0 && (
+                <span className="text-red-500 font-semibold">취소 {cancelled.length}건</span>
+              )}
+            </span>
             {showDone ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
           {showDone && (
-            <div className="px-3 pb-3 grid grid-cols-1 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto opacity-70">
-              {done.map((order) => (
-                <OrderCard key={order.id} order={order} onCancel={setCancelTargetId} />
-              ))}
+            <div className="px-3 pb-3 max-h-60 overflow-y-auto">
+              {completed.length > 0 && (
+                <>
+                  <p className="text-xs text-gray-400 font-semibold px-1 pt-2 pb-1">수령완료</p>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 opacity-70">
+                    {completed.map((order) => (
+                      <OrderCard key={order.id} order={order} onCancel={setCancelTargetId} />
+                    ))}
+                  </div>
+                </>
+              )}
+              {cancelled.length > 0 && (
+                <>
+                  <p className="text-xs text-red-400 font-semibold px-1 pt-3 pb-1">취소됨</p>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 opacity-70">
+                    {cancelled.map((order) => (
+                      <OrderCard key={order.id} order={order} onCancel={setCancelTargetId} />
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>

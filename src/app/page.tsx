@@ -6,8 +6,8 @@ import { CartItem, MenuItem, MenuOption } from '@/types';
 import { getFlavorColor } from '@/lib/flavor';
 import MenuItemCard from '@/components/MenuItem';
 import CartItemCard from '@/components/CartItem';
-import { ShoppingCart, X, Info, Plus, Minus, Check, Clock } from 'lucide-react';
-import { createOrder, getOrderStatus, subscribeToWaitQueueCount, calcWaitTimeText, QueueCounts } from '@/lib/orders';
+import { ShoppingCart, X, Info, Plus, Minus, Check, Clock, Flame, Snowflake } from 'lucide-react';
+import { createOrder, getOrderStatus, subscribeToWaitQueueCount, calcWaitTimeText, getQueueCupTotal, QueueCounts } from '@/lib/orders';
 import { MENU } from '@/lib/menu';
 import { getCart, saveCart } from '@/lib/cart';
 import { getActiveOrders, addActiveOrder, removeActiveOrder, ActiveOrderInfo } from '@/lib/activeOrder';
@@ -16,7 +16,14 @@ import Link from 'next/link';
 
 
 const MAX_ITEMS = 10;
-const OPTION_LABEL: Record<MenuOption, string> = { hot: '핫 8oz', ice: '아이스 14oz' };
+const MAX_ACTIVE_ORDERS = 3;
+
+function validateCustomerName(name: string): string | null {
+  if (!name) return '입금자명을 입력해주세요';
+  if (name.length > 5) return '이름은 5자 이하로 입력해주세요';
+  if (!/^[가-힣a-zA-Z0-9]+$/.test(name)) return '이모지, 특수문자, 초성은 사용할 수 없습니다';
+  return null;
+}
 
 export default function HomePage() {
   const router = useRouter();
@@ -252,8 +259,12 @@ export default function HomePage() {
 
   const handleConfirmOrder = async () => {
     const trimmed = customerName.trim();
-    if (!trimmed) { setNameError('입금자명을 입력해주세요'); return; }
-    if (trimmed.length > 5) { setNameError('이름은 5자 이하로 입력해주세요'); return; }
+    const validationError = validateCustomerName(trimmed);
+    if (validationError) { setNameError(validationError); return; }
+    if (activeOrders.length >= MAX_ACTIVE_ORDERS) {
+      setNameError(`진행 중인 주문이 ${MAX_ACTIVE_ORDERS}건 있습니다. 완료 후 다시 주문해주세요.`);
+      return;
+    }
     setNameError('');
     setIsOrdering(true);
     try {
@@ -392,7 +403,7 @@ export default function HomePage() {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-red-700">주문이 만료되었습니다</p>
               <p className="text-xs text-red-500 mt-0.5">{o.name}님 · {o.total.toLocaleString('ko-KR')}원 · {o.orderId}</p>
-              <p className="text-xs text-red-400 mt-1">주문 후 30분이 지났습니다. 원하시면 다시 주문해주세요.</p>
+              <p className="text-xs text-red-400 mt-1">주문 후 10분이 지났습니다. 원하시면 다시 주문해주세요.</p>
             </div>
             <button
               onClick={() => {
@@ -474,7 +485,7 @@ export default function HomePage() {
 
             {/* 스크롤 영역 */}
             <div data-scroll-allow className="overflow-y-auto flex-1">
-              <div className="w-full aspect-square relative overflow-hidden">
+              <div className="w-full aspect-[4/3] relative overflow-hidden">
                 {selectedMenu.image ? (
                   <Image
                     src={selectedMenu.image}
@@ -568,13 +579,15 @@ export default function HomePage() {
                     <button
                       key={opt}
                       onClick={() => setModalOption(opt)}
-                      className={`flex-1 py-3 text-sm font-semibold transition-colors ${
+                      className={`flex-1 py-3 text-sm font-semibold transition-colors flex items-center justify-center gap-1.5 ${
                         modalOption === opt
                           ? 'bg-sage-600 text-white'
                           : 'bg-white text-gray-500 hover:bg-sage-50'
                       }`}
                     >
-                      {OPTION_LABEL[opt]}
+                      {opt === 'hot'
+                        ? <><Flame className="w-3.5 h-3.5" /> 핫 8oz</>
+                        : <><Snowflake className="w-3.5 h-3.5" /> 아이스 14oz</>}
                     </button>
                   ))}
                 </div>
@@ -673,17 +686,33 @@ export default function HomePage() {
             </div>
             {cart.length > 0 && (
               <div className="px-5 py-4 border-t border-gray-100 bg-gray-50/50">
-                <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2.5 mb-3">
-                  <Clock className="w-4 h-4 text-sage-600 shrink-0" />
-                  <span className="text-xs text-sage-700 font-medium">예상 대기</span>
-                  <span className="text-xs font-bold text-sage-900 ml-auto">
-                    {calcWaitTimeText(waitQueueCounts, {
-                      hangsang: cart.filter(c => c.menuId === 'hangsang').reduce((s, c) => s + c.quantity, 0),
-                      pureun:   cart.filter(c => c.menuId === 'pureun').reduce((s, c) => s + c.quantity, 0),
-                      namu:     cart.filter(c => c.menuId === 'namu').reduce((s, c) => s + c.quantity, 0),
-                    })}
-                  </span>
-                </div>
+                {(() => {
+                  const cartCounts = {
+                    hangsang: cart.filter(c => c.menuId === 'hangsang').reduce((s, c) => s + c.quantity, 0),
+                    pureun:   cart.filter(c => c.menuId === 'pureun').reduce((s, c) => s + c.quantity, 0),
+                    namu:     cart.filter(c => c.menuId === 'namu').reduce((s, c) => s + c.quantity, 0),
+                  };
+                  const cups = getQueueCupTotal(waitQueueCounts, cartCounts);
+                  const timeText = calcWaitTimeText(waitQueueCounts, cartCounts);
+                  return (
+                    <div className="bg-white border border-gray-200 rounded-xl px-3 py-2.5 mb-3">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <Clock className="w-4 h-4 text-sage-600 shrink-0" />
+                        <span className="text-xs text-sage-700 font-medium">예상 대기</span>
+                        <span className="text-xs font-bold text-sage-900 ml-auto">{timeText}</span>
+                      </div>
+                      {cups > 0 && (
+                        <div className="flex items-center gap-1 flex-wrap">
+                          <span className="text-xs text-gray-400">내 주문 앞</span>
+                          <span className="text-xs font-semibold text-sage-700">{cups}잔 대기 중</span>
+                          <span className="text-xs">
+                            {'☕'.repeat(Math.min(cups, 8))}{cups > 8 ? ` +${cups - 8}` : ''}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-gray-600 font-medium">총 금액</span>
                   <span className="text-xl font-bold text-sage-800">
