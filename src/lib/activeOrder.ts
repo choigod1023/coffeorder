@@ -1,5 +1,5 @@
 const KEY = 'scc_active_orders';
-export const EXPIRY_MS = 30 * 60 * 1000; // 30분
+export const EXPIRY_MS = 10 * 60 * 1000; // 10분
 
 export interface ActiveOrderInfo {
   orderId: string;

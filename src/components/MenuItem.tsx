@@ -18,7 +18,7 @@ export default function MenuItem({ item, cartQty, onPress }: MenuItemProps) {
       onClick={onPress}
       className="w-full text-left rounded-2xl overflow-hidden bg-white shadow-sm active:scale-[0.97] transition-transform"
     >
-      <div className="relative w-full aspect-square">
+      <div className="relative w-full aspect-[4/3]">
         {item.image ? (
           <Image
             src={item.image}
